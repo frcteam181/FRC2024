@@ -41,6 +41,13 @@ public class Arm extends SubsystemBase {
         m_pidController = m_rightMotor.getPIDController();
         m_pidController.setFeedbackDevice(m_encoder);
 
+        m_pidController.setP(kARM_GAINS.kP, kARM_PID_SLOT_ID);
+        m_pidController.setI(kARM_GAINS.kI, kARM_PID_SLOT_ID);
+        m_pidController.setD(kARM_GAINS.kD, kARM_PID_SLOT_ID);
+        m_pidController.setIZone(kARM_GAINS.kIzone, kARM_PID_SLOT_ID);
+        m_pidController.setFF(kARM_GAINS.kFF, kARM_PID_SLOT_ID);
+        m_pidController.setOutputRange(kARM_GAINS.kMinOutput, kARM_GAINS.kMaxOutput, kARM_PID_SLOT_ID);
+
         m_leftMotor.setSmartCurrentLimit(kLEFT_ARM_CURRENT_LIMIT);
         m_rightMotor.setSmartCurrentLimit(kRIGHT_ARM_CURRENT_LIMIT);
 
@@ -55,9 +62,9 @@ public class Arm extends SubsystemBase {
 
         m_armProfile = new TrapezoidProfile(m_constraints);
 
-        m_start = new TrapezoidProfile.State(0, 0);
-        m_state = new TrapezoidProfile.State(0, 0);
-        m_goal = new TrapezoidProfile.State(0, 0);
+        m_start = new TrapezoidProfile.State(0.0, 0.0);
+        m_state = new TrapezoidProfile.State(0.0, 0.0);
+        m_goal = new TrapezoidProfile.State(0.0, 0.0);
 
         m_enabled = false;
 
@@ -84,7 +91,7 @@ public class Arm extends SubsystemBase {
     }
 
     public void setGoal(double pos) {
-        m_goal = new TrapezoidProfile.State(pos, 0);
+        m_goal = new TrapezoidProfile.State(pos, 0.0);
     }
 
     public void moveArm(double speed) {
@@ -100,7 +107,7 @@ public class Arm extends SubsystemBase {
     }
 
     public void stopArm() {
-        m_rightMotor.set(0);
+        m_rightMotor.set(0.0);
     }
 
     public void tune() {

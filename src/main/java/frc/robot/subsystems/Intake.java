@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
@@ -12,6 +13,8 @@ public class Intake extends SubsystemBase {
 
     private CANSparkMax m_intake_motor;
 
+    private RelativeEncoder m_encoder;
+
     private SparkPIDController m_pidController;
 
     private boolean m_isTuning;
@@ -20,18 +23,18 @@ public class Intake extends SubsystemBase {
 
         m_intake_motor = new CANSparkMax(kINTAKE_ID, MotorType.kBrushless);
 
-        m_intake_motor.setSmartCurrentLimit(20);
+        m_intake_motor.restoreFactoryDefaults();
+
+        m_intake_motor.setSmartCurrentLimit(kINTAKE_CURRENT_LIMIT);
 
         m_intake_motor.setInverted(true);
 
-        m_pidController = m_intake_motor.getPIDController();
+        m_encoder = m_intake_motor.getEncoder();
+        m_encoder.setInverted(false);
+        m_encoder.setPositionConversionFactor(kINTAKE_POS_FACTOR_RAD); // rad
+        m_encoder.setVelocityConversionFactor(kINTAKE_VEL_FACTOR_RAD); // rad/sec
 
-        m_pidController.setP(kINTAKE_GAINS.kP, kINTAKE_PID_SLOT_ID);
-        m_pidController.setI(kINTAKE_GAINS.kI, kINTAKE_PID_SLOT_ID);
-        m_pidController.setD(kINTAKE_GAINS.kD, kINTAKE_PID_SLOT_ID);
-        m_pidController.setIZone(kINTAKE_GAINS.kIzone, kINTAKE_PID_SLOT_ID);
-        m_pidController.setFF(kINTAKE_GAINS.kFF, kINTAKE_PID_SLOT_ID);
-        m_pidController.setOutputRange(kINTAKE_GAINS.kMinOutput, kINTAKE_GAINS.kMaxOutput, kINTAKE_PID_SLOT_ID);
+        m_pidController = m_intake_motor.getPIDController();
 
         m_pidController.setP(kINTAKE_GAINS.kP, kINTAKE_PID_SLOT_ID);
         m_pidController.setI(kINTAKE_GAINS.kI, kINTAKE_PID_SLOT_ID);

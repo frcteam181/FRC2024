@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
@@ -12,6 +14,10 @@ import static frc.robot.Constants.*;
 public class DriveTrain extends SubsystemBase {
 
     private CANSparkMax m_leftLeader, m_leftFollower, m_rightLeader, m_rightFollower;
+
+    private RelativeEncoder m_leftEncoder, m_rightEncoder;
+
+    private SparkPIDController m_leftPID, m_rightPID;
 
     private DifferentialDrive m_diffDrive;
 
@@ -29,7 +35,8 @@ public class DriveTrain extends SubsystemBase {
         m_rightLeader.restoreFactoryDefaults();
         m_rightFollower.restoreFactoryDefaults();
 
-        m_leftLeader.setSmartCurrentLimit(kLEFT_ARM_CURRENT_LIMIT);
+        m_leftLeader.setSmartCurrentLimit(kLEFT_DRIVETRAIN_CURRENT_LIMIT);
+        m_rightLeader.setSmartCurrentLimit(kLEFT_DRIVETRAIN_CURRENT_LIMIT);
 
         m_leftFollower.follow(m_leftLeader);
         m_rightFollower.follow(m_rightLeader);
@@ -39,6 +46,33 @@ public class DriveTrain extends SubsystemBase {
 
         m_leftLeader.setIdleMode(IdleMode.kBrake);
         m_rightLeader.setIdleMode(IdleMode.kBrake);
+
+        m_leftEncoder = m_leftLeader.getEncoder();
+        m_leftEncoder.setInverted(false);
+        m_leftEncoder.setPositionConversionFactor(kDRIVETRAIN_POS_FACTOR_METER); // m
+        m_leftEncoder.setVelocityConversionFactor(kDRIVETRAIN_VEL_FACTOR_METER); // m/sec
+
+        m_rightEncoder = m_rightLeader.getEncoder();
+        m_rightEncoder.setInverted(false);
+        m_rightEncoder.setPositionConversionFactor(kDRIVETRAIN_POS_FACTOR_METER); // m
+        m_rightEncoder.setVelocityConversionFactor(kDRIVETRAIN_VEL_FACTOR_METER); // m/sec
+
+        m_leftPID = m_leftLeader.getPIDController();
+        m_rightPID = m_rightLeader.getPIDController();
+
+        m_leftPID.setP(kDRIVE_GAINS.kP, kDRIVE_PID_SLOT_ID);
+        m_leftPID.setI(kDRIVE_GAINS.kI, kDRIVE_PID_SLOT_ID);
+        m_leftPID.setD(kDRIVE_GAINS.kD, kDRIVE_PID_SLOT_ID);
+        m_leftPID.setIZone(kDRIVE_GAINS.kIzone, kDRIVE_PID_SLOT_ID);
+        m_leftPID.setFF(kDRIVE_GAINS.kFF, kDRIVE_PID_SLOT_ID);
+        m_leftPID.setOutputRange(kDRIVE_GAINS.kMinOutput, kDRIVE_GAINS.kMaxOutput, kDRIVE_PID_SLOT_ID);
+
+        m_rightPID.setP(kDRIVE_GAINS.kP, kDRIVE_PID_SLOT_ID);
+        m_rightPID.setI(kDRIVE_GAINS.kI, kDRIVE_PID_SLOT_ID);
+        m_rightPID.setD(kDRIVE_GAINS.kD, kDRIVE_PID_SLOT_ID);
+        m_rightPID.setIZone(kDRIVE_GAINS.kIzone, kDRIVE_PID_SLOT_ID);
+        m_rightPID.setFF(kDRIVE_GAINS.kFF, kDRIVE_PID_SLOT_ID);
+        m_rightPID.setOutputRange(kDRIVE_GAINS.kMinOutput, kDRIVE_GAINS.kMaxOutput, kDRIVE_PID_SLOT_ID);
 
         m_diffDrive = new DifferentialDrive(m_leftLeader, m_rightLeader);
 
