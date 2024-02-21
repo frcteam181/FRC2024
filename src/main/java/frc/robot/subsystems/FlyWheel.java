@@ -30,7 +30,7 @@ public class FlyWheel extends SubsystemBase {
         m_leftFlyWheel.follow(m_rightFlyWheel, true);
 
         m_encoder = m_rightFlyWheel.getEncoder();
-        m_encoder.setInverted(false);
+        //m_encoder.setInverted(false);
         m_encoder.setPositionConversionFactor(kFLYWHEEL_POS_FACTOR_RAD); // rad
         m_encoder.setVelocityConversionFactor(kFLYWHEEL_VEL_FACTOR_RAD); // rad/sec
 
@@ -49,8 +49,18 @@ public class FlyWheel extends SubsystemBase {
 
     }
 
+    @Override
+    public void periodic() {
+        /* TUNING */
+        if(m_isTuning) {periodicTuning();}
+    }
+
     public void shoot(double speed) {
         m_rightFlyWheel.set(speed);
+    }
+
+    public void periodicTuning() {
+        
     }
 
     public void tune() {

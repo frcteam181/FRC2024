@@ -1,4 +1,4 @@
-package frc.robot.commands.Arm_C;
+package frc.robot.commands.arm_actions;
 
 import static frc.robot.Constants.*;
 

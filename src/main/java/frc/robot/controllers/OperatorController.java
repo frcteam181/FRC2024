@@ -4,8 +4,8 @@ import static frc.robot.Constants.*;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.commands.Arm_C.moveArmDown;
-import frc.robot.commands.Arm_C.moveArmUp;
+import frc.robot.commands.arm_actions.moveArmDown;
+import frc.robot.commands.arm_actions.moveArmUp;
 import frc.robot.commands.defaults.DefaultArm;
 import frc.robot.commands.defaults.DefaultFlyWheel;
 import frc.robot.commands.defaults.DefaultIntake;

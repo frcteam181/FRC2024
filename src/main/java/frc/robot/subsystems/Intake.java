@@ -5,6 +5,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static frc.robot.Constants.*;
@@ -17,7 +18,9 @@ public class Intake extends SubsystemBase {
 
     private SparkPIDController m_pidController;
 
-    private boolean m_isTuning;
+    private boolean m_isTuning, m_hasNote;
+
+    private DigitalInput m_noteBeam;
 
     public Intake(boolean isTuning) {
 
@@ -30,7 +33,7 @@ public class Intake extends SubsystemBase {
         m_intake_motor.setInverted(true);
 
         m_encoder = m_intake_motor.getEncoder();
-        m_encoder.setInverted(false);
+        //m_encoder.setInverted(false);
         m_encoder.setPositionConversionFactor(kINTAKE_POS_FACTOR_RAD); // rad
         m_encoder.setVelocityConversionFactor(kINTAKE_VEL_FACTOR_RAD); // rad/sec
 
@@ -43,14 +46,27 @@ public class Intake extends SubsystemBase {
         m_pidController.setFF(kINTAKE_GAINS.kFF, kINTAKE_PID_SLOT_ID);
         m_pidController.setOutputRange(kINTAKE_GAINS.kMinOutput, kINTAKE_GAINS.kMaxOutput, kINTAKE_PID_SLOT_ID);
 
+        //m_noteBeam = new DigitalInput(kNOTE_BEAM_CHANNEL);
+        //m_hasNote = m_noteBeam.get();
+
         /* Tuning */
         m_isTuning = isTuning;
         if(m_isTuning){tune();}
         
     }
 
+    @Override
+    public void periodic() {
+        /* TUNING */
+        if(m_isTuning) {periodicTuning();}
+    }
+
     public void handle_intake(double speed) {
         m_intake_motor.set(speed);
+    }
+
+    public void periodicTuning() {
+
     }
 
     public void tune() {
