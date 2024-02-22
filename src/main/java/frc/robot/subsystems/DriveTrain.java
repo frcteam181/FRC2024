@@ -246,11 +246,6 @@ public class DriveTrain extends SubsystemBase {
         m_leftResponseIn = new double[2];
         m_rightResponseIn = new double[2];
 
-        /*e_kP.close();
-        e_kI.close();
-        e_kD.close();
-        e_setpointDeg.close();*/
-
         e_kP = m_tab.add("Proportional Gain", m_kP).withPosition(0, 0).getEntry();
         e_kI = m_tab.add("Integral Gain", m_kI).withPosition(0, 1).getEntry();
         e_kD = m_tab.add("Derivative Gain", m_kD).withPosition(0, 2).getEntry();
@@ -258,22 +253,22 @@ public class DriveTrain extends SubsystemBase {
         e_leftSetpointIn = m_tab.add("Left Setpoint In", m_leftSetpointIn).withPosition(1, 0).getEntry();
         e_rightSetpointIn = m_tab.add("Right Setpoint In", m_rightSetpointIn).withPosition(1, 0).getEntry();
 
-        m_tab.addDoubleArray("Left Response Deg", this::getLeftResponseIn).withPosition(2,1).withSize(3,3).withWidget(BuiltInWidgets.kGraph);
-        m_tab.addDoubleArray("Right Response Deg", this::getRightResponseIn).withPosition(2,1).withSize(3,3).withWidget(BuiltInWidgets.kGraph);
+        m_tab.addDoubleArray("Left Response In", this::getLeftResponseIn).withPosition(2,1).withSize(3,3).withWidget(BuiltInWidgets.kGraph);
+        m_tab.addDoubleArray("Right Response In", this::getRightResponseIn).withPosition(2,1).withSize(3,3).withWidget(BuiltInWidgets.kGraph);
 
         // Left Telemetry
-        /*m_tab.addNumber("Left Volts (V)", this::getLeftVoltage).withPosition(1, 1);
+        m_tab.addNumber("Left Volts (V)", this::getLeftVoltage).withPosition(1, 1);
         m_tab.addNumber("Left Amps (A)", this::getLeftCurrent).withPosition(1, 2);
-        m_tab.addNumber("Left Temp ()", this::getLeftTemp).withPosition(1, 3);
+        m_tab.addNumber("Left Temp (C)", this::getLeftTemp).withPosition(1, 3);
+        m_tab.addNumber("Left Position (in)", this::getLeftPosIn).withPosition(2, 0);
+        m_tab.addNumber("Left Speed (in p sec)", this::getLeftSpeedIn).withPosition(3, 0);
 
         // Right Telemetry
         m_tab.addNumber("Right Volts (V)", this::getRightVoltage).withPosition(5, 1);
         m_tab.addNumber("Right Amps (A)", this::getRightCurrent).withPosition(5, 2);
-        m_tab.addNumber("Right Temp ()", this::getRightTemp).withPosition(5, 3);*/
-
-        // Subsystem Telemetry
-        /*m_tab.addNumber("Position (deg)", this::getPosDeg).withPosition(2, 0);
-        m_tab.addNumber("Speed (deg p sec)", this::getSpeed).withPosition(3, 0);*/
+        m_tab.addNumber("Right Temp (C)", this::getRightTemp).withPosition(5, 3);
+        m_tab.addNumber("Right Position (in)", this::getRightPosIn).withPosition(2, 0);
+        m_tab.addNumber("Right Speed (in p sec)", this::getRightSpeedIn).withPosition(3, 0);
         
     }
     

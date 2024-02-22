@@ -3,6 +3,7 @@ package frc.robot.commands.defaults;
 import static frc.robot.Constants.*;
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.DriveTrain;
@@ -13,9 +14,10 @@ public class DefaultDriveTrain extends Command {
 
     private Joystick m_leftStick, m_rightStick, m_joystick;
 
-    private XboxController m_controller;
+    private XboxController m_controllerXbox;
+    private PS4Controller m_controllerPS4;
 
-    private boolean m_isTankDrive, m_isJoystick, m_isSquared;
+    private boolean m_isTankDrive, m_isPS4, m_isJoystick, m_isSquared;
     private double m_leftYValue, m_rightYValue, m_forwardValue, m_turnValue;
 
     // Two Stick (Joystick)
@@ -52,9 +54,15 @@ public class DefaultDriveTrain extends Command {
     }
 
     // Two Stick (Controller)
-    public DefaultDriveTrain(XboxController controller, boolean isTankDrive, boolean squareInput) {
+    public DefaultDriveTrain(boolean isPS4, boolean isTankDrive, boolean squareInput) {
 
-        m_controller = controller;
+        m_isPS4 = isPS4;
+
+        if(isPS4) {
+            m_controllerPS4 = new PS4Controller(kCONTROLLER);
+        } else {
+            m_controllerXbox = new XboxController(kCONTROLLER);
+        }
 
         m_isTankDrive = isTankDrive;
         m_isJoystick = false;
@@ -99,16 +107,30 @@ public class DefaultDriveTrain extends Command {
 
         } else {
 
-            if (m_isTankDrive) {
+            if(m_isPS4) {
+                if (m_isTankDrive) {
 
-                m_leftYValue = m_controller.getLeftY();
-                m_rightYValue = m_controller.getRightY();
+                m_leftYValue = m_controllerPS4.getLeftY();
+                m_rightYValue = m_controllerPS4.getRightY();
 
+                } else {
+
+                    m_forwardValue = m_controllerPS4.getLeftY();
+                    m_turnValue = m_controllerPS4.getRightX();
+                    
+                }
             } else {
+                if (m_isTankDrive) {
 
-                m_forwardValue = m_controller.getLeftY();
-                m_turnValue = m_controller.getRightX();
+                m_leftYValue = m_controllerXbox.getLeftY();
+                m_rightYValue = m_controllerXbox.getRightY();
+
+                } else {
+
+                m_forwardValue = m_controllerXbox.getLeftY();
+                m_turnValue = m_controllerXbox.getRightX();
                 
+                }
             }
 
         }

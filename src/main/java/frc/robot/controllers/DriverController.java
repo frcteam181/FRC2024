@@ -1,7 +1,6 @@
 package frc.robot.controllers;
 
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.defaults.DefaultDriveTrain;
 import frc.robot.subsystems.DriveTrain;
 
@@ -12,9 +11,8 @@ public class DriverController {
     private DriveTrain m_driveTrain;
 
     private Joystick m_joystickOne, m_joystickTwo;
-    private XboxController m_controller;
 
-    public DriverController(boolean isJoystick, boolean isTankDrive, boolean isSquaredInput) {
+    public DriverController(boolean isJoystick, boolean isPS4, boolean isTankDrive, boolean isSquaredInput) {
 
         m_driveTrain = kDRIVE_TRAIN;
 
@@ -25,7 +23,7 @@ public class DriverController {
                 stickArcadeSetup(isSquaredInput);
             }
         } else {
-            controllerSetup(isTankDrive, isSquaredInput);
+            controllerSetup(isTankDrive, isPS4, isSquaredInput);
         }
 
     }
@@ -47,11 +45,9 @@ public class DriverController {
 
     }
 
-    private void controllerSetup(boolean isTankDrive, boolean isSquaredInput) {
+    private void controllerSetup(boolean isTankDrive, boolean isPS4, boolean isSquaredInput) {
 
-        m_controller = new XboxController(kCONTROLLER);
-
-        m_driveTrain.setDefaultCommand(new DefaultDriveTrain(m_controller, isTankDrive, isSquaredInput));
+        m_driveTrain.setDefaultCommand(new DefaultDriveTrain(isPS4, isTankDrive, isSquaredInput));
 
     }
     

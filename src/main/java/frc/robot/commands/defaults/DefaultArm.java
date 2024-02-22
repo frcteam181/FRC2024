@@ -2,6 +2,7 @@ package frc.robot.commands.defaults;
 
 import static frc.robot.Constants.*;
 
+import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Arm;
@@ -10,13 +11,19 @@ public class DefaultArm extends Command {
 
     private Arm m_arm;
 
-    private XboxController m_controller;
+    private XboxController m_controllerXbox;
+    private PS4Controller m_controllerPS4;
 
     private double m_speed;
 
-    public DefaultArm(XboxController controller) {
+    private boolean m_isPS4;
 
-        m_controller = controller;
+    public DefaultArm(XboxController controllerXbox, PS4Controller controllerPS4, boolean isPS4) {
+
+        m_controllerXbox = controllerXbox;
+        m_controllerPS4 = controllerPS4;
+
+        m_isPS4 = isPS4;
 
         m_arm = kARM;
 
@@ -29,7 +36,5 @@ public class DefaultArm extends Command {
         //m_speed = m_controller.getRightY();
         //m_arm.moveArm(m_speed);
     }
-
-
     
 }
