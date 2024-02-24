@@ -72,23 +72,25 @@ public class OperatorController {
 
     public void bindPS4Buttons() {
         
-        //m_sPS4.whileTrue(new moveArmDown());
-        //m_tPS4.whileTrue(new moveArmUp());
-        //m_cPS4.onTrue(m_arm.goToCommand(Math.toRadians(45)));
-        //m_xPS4.onTrue(m_arm.goToCommand(Math.toRadians(0)));
+        //m_cPS4.onTrue(new moveArmDown());
+        //m_xPS4.onTrue(new moveArmUp());
 
-        m_cPS4.onTrue(m_wrist.setGoalCommand(Math.toRadians(110)));
-        m_xPS4.onTrue(m_wrist.setGoalCommand(Math.toRadians(0)));
-        m_sharePS4.onTrue(m_wrist.setGoalCommand(Math.toRadians(-260)));
+        m_cPS4.onTrue(m_wrist.setGoalCommand(Math.toRadians(50)));
+        m_tPS4.onTrue(m_wrist.setGoalCommand(Math.toRadians(0)));
+        //m_sPS4.onTrue(m_wrist.setGoalCommand(Math.toRadians(-100)));
 
-        m_tPS4.onTrue(m_arm.setGoalCommand(Math.toRadians(45)));
-        m_sPS4.onTrue(m_arm.setGoalCommand(Math.toRadians(0)));
+        m_rbPS4.onTrue(m_arm.setGoalCommand(Math.toRadians(85)));
+        m_lbPS4.onTrue(m_arm.setGoalCommand(Math.toRadians(0)));
 
-        m_lbPS4.whileTrue(new tiltWristDown());
-        m_rbPS4.whileTrue(new tiltWristUp());
+        //m_sharePS4.whileTrue(new tiltWristDown());
+        //m_xPS4.whileTrue(new tiltWristUp());
 
         //m_optionsPS4.onTrue(m_arm.updateNowCommand()); //arm
-        m_optionsPS4.onTrue(m_wrist.updateNowCommand()); //wrist
+        //m_optionsPS4.onTrue(m_wrist.updateNowCommand()); //wrist
+        m_optionsPS4.onTrue(m_intake.updateNowCommand()); //intake
+
+        m_sPS4.onTrue(m_intake.setTuningVelCommand());
+        m_xPS4.onTrue(m_intake.setVelCommand(Math.toRadians(0)));
 
     }
 

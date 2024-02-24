@@ -1,13 +1,9 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkAbsoluteEncoder;
-import com.revrobotics.SparkMaxAlternateEncoder;
 import com.revrobotics.SparkPIDController;
-import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkBase;
-import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
@@ -28,7 +24,7 @@ import static frc.robot.Constants.*;
 public class Arm extends SubsystemBase {
 
     private CANSparkMax m_leftMotor, m_rightMotor;
-    private RelativeEncoder m_encoder;
+    private SparkAbsoluteEncoder m_encoder;
     private SparkPIDController m_pid;
 
     private TrapezoidProfile.Constraints m_constraints;
@@ -54,11 +50,11 @@ public class Arm extends SubsystemBase {
         m_leftMotor.restoreFactoryDefaults();
         m_rightMotor.restoreFactoryDefaults();
 
-        m_encoder = m_rightMotor.getEncoder();
-        //m_encoder = m_rightMotor.getAlternateEncoder(SparkMaxAlternateEncoder.Type.kQuadrature, 8192);
-        //m_encoder.setInverted(false);
+        m_encoder = m_rightMotor.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle);
         m_encoder.setPositionConversionFactor(kARM_POS_FACTOR_RAD); // rad
         m_encoder.setVelocityConversionFactor(kARM_VEL_FACTOR_RAD); // rad/sec
+        m_encoder.setInverted(false);
+        m_encoder.setZeroOffset(kARM_ZERO_OFFSET);
 
         m_pid = m_rightMotor.getPIDController();
         m_pid.setFeedbackDevice(m_encoder);
@@ -76,7 +72,7 @@ public class Arm extends SubsystemBase {
         m_leftMotor.setSmartCurrentLimit(kLEFT_ARM_CURRENT_LIMIT);
         m_rightMotor.setSmartCurrentLimit(kRIGHT_ARM_CURRENT_LIMIT);
 
-        m_rightMotor.setOpenLoopRampRate(0.35);
+        m_rightMotor.setOpenLoopRampRate(1);
 
         m_leftMotor.follow(m_rightMotor, true);
 
@@ -89,9 +85,8 @@ public class Arm extends SubsystemBase {
 
         m_armProfile = new TrapezoidProfile(m_constraints);
 
-        m_start = new TrapezoidProfile.State(0.0, 0.0);
-        m_state = new TrapezoidProfile.State(0.0, 0.0);
-        m_goal = new TrapezoidProfile.State(0.0, 0.0);
+        m_state = new TrapezoidProfile.State(kZERO_ARM, 0.0);
+        m_goal = new TrapezoidProfile.State(kZERO_ARM, 0.0);
 
         m_enabled = true;
 
@@ -121,8 +116,8 @@ public class Arm extends SubsystemBase {
     // Trapezoid Methods
 
     public void useState(TrapezoidProfile.State state) {
-        m_armFFValue = m_armFF.calculate(state.position, state.velocity);
-        m_setpoint = state.position;
+        m_setpoint = (state.position - kZERO_ARM); // Corrected to account for abs encoder not being at exactly zero
+        m_armFFValue = m_armFF.calculate(m_setpoint, state.velocity);
         m_pid.setReference(state.position, CANSparkBase.ControlType.kPosition, kARM_PID_SLOT_ID, m_armFFValue);
     }
 
@@ -131,7 +126,7 @@ public class Arm extends SubsystemBase {
     }
 
     public void setGoal(double pos) {
-        m_goal = new TrapezoidProfile.State(pos, 0.0);
+        m_goal = new TrapezoidProfile.State((pos + kZERO_ARM), 0.0);
     }
 
     public Command setGoalCommand(TrapezoidProfile.State goal) {
@@ -169,7 +164,7 @@ public class Arm extends SubsystemBase {
     }
 
     public double getPos() {
-        return m_encoder.getPosition();
+        return (m_encoder.getPosition() - kZERO_ARM);
     }
 
     public double getPosDeg() {
@@ -216,7 +211,7 @@ public class Arm extends SubsystemBase {
 
     public void goTo(double setpointRad) {
         m_setpoint = setpointRad;
-        m_pid.setReference(setpointRad, CANSparkBase.ControlType.kPosition, kARM_PID_SLOT_ID, m_armFFValue);
+        //m_pid.setReference(setpointRad, CANSparkBase.ControlType.kPosition, kARM_PID_SLOT_ID, m_armFFValue);
     }
 
     public Command goToCommand(double setgoalRad) {
@@ -262,6 +257,10 @@ public class Arm extends SubsystemBase {
         return m_kKV;
     }
 
+    public double getFFValue() {
+        return m_armFFValue;
+    }
+
     public void tune() {
 
         m_tab = Shuffleboard.getTab("Arm Tuner");
@@ -302,13 +301,15 @@ public class Arm extends SubsystemBase {
         m_tab.addNumber("Position (deg)", this::getPosDeg).withPosition(5, 0);
         m_tab.addNumber("Speed (deg p sec)", this::getSpeedDeg).withPosition(6, 0);
 
-        e_kKS = m_tab.add("Static Gain", m_kP).withPosition(7, 0).getEntry();
-        e_kKG = m_tab.add("Gravity Gain", m_kI).withPosition(7, 1).getEntry();
-        e_kKV = m_tab.add("Velocity Gain", m_kD).withPosition(7, 2).getEntry();
+        e_kKS = m_tab.add("Static Gain", m_kKS).withPosition(7, 0).getEntry();
+        e_kKG = m_tab.add("Gravity Gain", m_kKG).withPosition(7, 1).getEntry();
+        e_kKV = m_tab.add("Velocity Gain", m_kKV).withPosition(7, 2).getEntry();
 
         m_tab.addNumber("kS", this::getKKS).withPosition(8, 0);
         m_tab.addNumber("kG", this::getKKG).withPosition(8, 1);
         m_tab.addNumber("kV", this::getKKV).withPosition(8, 2);
+
+        m_tab.addNumber("FF Value", this::getFFValue).withPosition(9, 0);
 
     }
 
@@ -337,9 +338,9 @@ public class Arm extends SubsystemBase {
             m_updateNow = false;
         }
 
-        var setpointDeg = e_setpointDeg.getDouble(0);
+        //var setpointDeg = e_setpointDeg.getDouble(0);
 
-        if(setpointDeg != m_setpointDeg) {m_setpointDeg = setpointDeg; m_setpoint = Math.toRadians(setpointDeg);}
+        //if(setpointDeg != m_setpointDeg) {m_setpointDeg = setpointDeg; m_setpoint = Math.toRadians(setpointDeg);}
 
     }
     

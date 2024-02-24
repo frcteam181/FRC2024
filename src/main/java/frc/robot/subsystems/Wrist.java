@@ -2,13 +2,11 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxAlternateEncoder;
+import com.revrobotics.SparkAbsoluteEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
-import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
@@ -17,13 +15,12 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 import static frc.robot.Constants.*;
 
 public class Wrist extends SubsystemBase {
 
     private CANSparkMax m_leftWrist, m_rightWrist;
-    private RelativeEncoder m_encoder;
+    private SparkAbsoluteEncoder m_encoder;
     private SparkPIDController m_pid;
 
     private TrapezoidProfile.Constraints m_constraints;
@@ -48,11 +45,11 @@ public class Wrist extends SubsystemBase {
         m_leftWrist.restoreFactoryDefaults();
         m_rightWrist.restoreFactoryDefaults();
 
-        //m_encoder = m_rightWrist.getAlternateEncoder(SparkMaxAlternateEncoder.Type.kQuadrature, 8192);
-        m_encoder = m_rightWrist.getEncoder();
-        //m_encoder.setInverted(false);
+        m_encoder = m_rightWrist.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle);
         m_encoder.setPositionConversionFactor(kWRIST_POS_FACTOR_RAD); // rad
         m_encoder.setVelocityConversionFactor(kWRIST_VEL_FACTOR_RAD); // rad/sec
+        m_encoder.setInverted(false);
+        m_encoder.setZeroOffset(kWRIST_ZERO_OFFSET);
 
         m_pid = m_rightWrist.getPIDController();
         m_pid.setFeedbackDevice(m_encoder);
@@ -78,9 +75,8 @@ public class Wrist extends SubsystemBase {
 
         m_wristProfile = new TrapezoidProfile(m_constraints);
 
-        m_start = new TrapezoidProfile.State(0.0, 0.0);
-        m_state = new TrapezoidProfile.State(0.0, 0.0);
-        m_goal = new TrapezoidProfile.State(0.0, 0.0);
+        m_state = new TrapezoidProfile.State(kZERO_WRIST, 0.0);
+        m_goal = new TrapezoidProfile.State(kZERO_WRIST, 0.0);
 
         m_enabled = true;
 
@@ -107,7 +103,7 @@ public class Wrist extends SubsystemBase {
     // Trapezoid Methods
 
     public void useState(TrapezoidProfile.State state) {
-        m_setpoint = state.position;
+        m_setpoint = (state.position - kZERO_WRIST);
         m_pid.setReference(state.position, CANSparkBase.ControlType.kPosition, kWRIST_PID_SLOT_ID);
     }
 
@@ -116,7 +112,7 @@ public class Wrist extends SubsystemBase {
     }
 
     public void setGoal(double pos) {
-        m_goal = new TrapezoidProfile.State(pos, 0.0);
+        m_goal = new TrapezoidProfile.State((pos + kZERO_WRIST), 0.0);
     }
 
 
@@ -155,7 +151,7 @@ public class Wrist extends SubsystemBase {
     }
 
     public double getPos() {
-        return m_encoder.getPosition();
+        return (m_encoder.getPosition() - kZERO_WRIST);
     }
 
     public double getPosDeg() {
@@ -168,12 +164,12 @@ public class Wrist extends SubsystemBase {
         return m_responseDeg;
     }
 
-    public double getSpeed() {
+    public double getVel() {
         return m_encoder.getVelocity();
     }
 
-    public double getSpeedDeg() {
-        return Math.toDegrees(getSpeed());
+    public double getVelDeg() {
+        return Math.toDegrees(getVel());
     }
 
     public double getLeftVoltage() {
@@ -261,16 +257,16 @@ public class Wrist extends SubsystemBase {
         // Left Telemetry
         m_tab.addNumber("Left Volts (V)", this::getLeftVoltage).withPosition(2, 1);
         m_tab.addNumber("Left Amps (A)", this::getLeftCurrent).withPosition(2, 2);
-        m_tab.addNumber("Left Temp ()", this::getLeftTemp).withPosition(2, 3);
+        m_tab.addNumber("Left Temp (C)", this::getLeftTemp).withPosition(2, 3);
 
         // Right Telemetry
         m_tab.addNumber("Right Volts (V)", this::getRightVoltage).withPosition(6, 1);
         m_tab.addNumber("Right Amps (A)", this::getRightCurrent).withPosition(6, 2);
-        m_tab.addNumber("Right Temp ()", this::getRightTemp).withPosition(6, 3);
+        m_tab.addNumber("Right Temp (C)", this::getRightTemp).withPosition(6, 3);
 
         // Subsystem Telemetry
         m_tab.addNumber("Position (deg)", this::getPosDeg).withPosition(5, 0);
-        m_tab.addNumber("Speed (deg p sec)", this::getSpeed).withPosition(6, 0);
+        m_tab.addNumber("Velocity (deg p sec)", this::getVel).withPosition(6, 0);
         
     }
 
@@ -291,10 +287,39 @@ public class Wrist extends SubsystemBase {
             m_updateNow = false;
         }
 
-        var setpointDeg = e_setpointDeg.getDouble(0);
+        //var setpointDeg = e_setpointDeg.getDouble(0);
 
-        if(setpointDeg != m_setpointDeg) {m_setpointDeg = setpointDeg; m_setpoint = Math.toRadians(m_setpointDeg);}
+        //if(setpointDeg != m_setpointDeg) {m_setpointDeg = setpointDeg; m_setpoint = Math.toRadians(m_setpointDeg);}
 
     }
     
 }
+
+
+/* PRESETS!!!
+
+
+ * Intake 
+ *      Arm = 0
+ *      Wrist = 0
+ * 
+ * Forward Amp
+ *      Arm = 49
+ *      Wrist = -0.7
+ * 
+ * Backward Amp
+ *      Arm = 94.5
+ *      Wrist = 5.6
+ * 
+ * Forward Air Speaker
+ *      Arm = 49
+ *      Wrist = -110
+ * 
+ * Backward Air Speaker
+ *      Arm = 81
+ *      Wrist = -76.9
+ * 
+ * Backward Ground Speaker
+ *      Arm = 16.5
+ *      Wrist = -2.4
+ */

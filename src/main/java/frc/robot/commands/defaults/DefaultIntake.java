@@ -39,7 +39,7 @@ public class DefaultIntake extends Command {
         } else {
             m_speed = m_controllerXbox.getLeftY();
         }
-        m_intake.handle_intake(m_speed);
+        m_intake.manualIntake(m_speed);
 
     }
     

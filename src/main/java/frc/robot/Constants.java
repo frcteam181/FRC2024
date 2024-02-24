@@ -59,24 +59,27 @@ public class Constants {
 
     // Arm
     public static final int kARM_PID_SLOT_ID = 0;
-    public static final Gains kARM_GAINS = new Gains(0.8, 0.0001, 0.0, 0.0, 0, -1.0, 1.0);
+    public static final Gains kARM_GAINS = new Gains(2.0, 0.0, 0.1, 0.0, 0, -1.0, 1.0);
 
-    public static final int kLEFT_ARM_CURRENT_LIMIT = 70;
-    public static final int kRIGHT_ARM_CURRENT_LIMIT = 70;
+    public static final int kLEFT_ARM_CURRENT_LIMIT = 20;
+    public static final int kRIGHT_ARM_CURRENT_LIMIT = 20;
 
-    public static final double kARM_GEAR_RATIO = (1.0/300.0); /////////////////////////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    public static final double kARM_GEAR_RATIO = (1.0/1.0);
     public static final double kARM_POS_FACTOR_RAD = Math.toRadians(kARM_GEAR_RATIO * 360.0); // rad
     public static final double kARM_VEL_FACTOR_RAD = (kARM_POS_FACTOR_RAD/60.0); // rad/sec
 
-    public static final double kMAX_ARM_VEL_RAD = Math.toRadians(120); // rad/s
-    public static final double kMAX_ARM_ACC_RAD = Math.toRadians(35); // rad/s^2
+    public static final double kMAX_ARM_VEL_RAD = Math.toRadians(120.0); // rad/s
+    public static final double kMAX_ARM_ACC_RAD = Math.toRadians(50.0); // rad/s^2
 
-    public static final double kMAX_ARM_POS_RAD = 0.0; // rad
-    public static final double kMIN_ARM_POS_RAD = 0.0; // rad
+    public static final double kARM_ZERO_OFFSET = Math.toRadians(0.0); // rad
+    public static final double kZERO_ARM = Math.toRadians(28.72); // On bumper reading = 0
+
+    public static final double kMAX_ARM_POS_RAD = Math.toRadians(0.0); // rad
+    public static final double kMIN_ARM_POS_RAD = Math.toRadians(0.0); // rad
 
     public static final double kARM_KS = 0.0;
-    public static final double kARM_KG = 0.0;
-    public static final double kARM_KV = 0.0;
+    public static final double kARM_KG = 0.1;
+    public static final double kARM_KV = 0.5;
 
     // Wrist
     public static final int kWRIST_PID_SLOT_ID = 0;
@@ -85,15 +88,18 @@ public class Constants {
     public static final int kLEFT_WRIST_CURRENT_LIMIT = 40;
     public static final int kRIGHT_WRIST_CURRENT_LIMIT = 40;
 
-    public static final double kWRIST_GEAR_RATIO = (1.0/25.0); ///////////////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    public static final double kWRIST_GEAR_RATIO = (1.0/1.0);
     public static final double kWRIST_POS_FACTOR_RAD = (Math.toRadians(kWRIST_GEAR_RATIO * 360.0)); // rad
     public static final double kWRIST_VEL_FACTOR_RAD = (kWRIST_POS_FACTOR_RAD/60.0); // rad/sec
 
     public static final double kMAX_WRIST_VEL_RAD = Math.toRadians(900); // rad/s
     public static final double kMAX_WRIST_ACC_RAD = Math.toRadians(500); // rad/s^2
 
-    public static final double kMAX_WRIST_POS_RAD = 0.0; // rad
-    public static final double kMIN_WRIST_POS_RAD = 0.0; // rad
+    public static final double kWRIST_ZERO_OFFSET = Math.toRadians(25.0); // rad
+    public static final double kZERO_WRIST = Math.toRadians(246.5);
+
+    public static final double kMAX_WRIST_POS_RAD = Math.toRadians(0.0); // rad
+    public static final double kMIN_WRIST_POS_RAD = Math.toRadians(0.0); // rad
 
     // Fly Wheel
     public static final int kFLYWHEEL_PID_SLOT_ID = 0;
@@ -106,8 +112,8 @@ public class Constants {
     public static final double kFLYWHEEL_POS_FACTOR_RAD = (Math.toRadians(kFLYWHEEL_GEAR_RATIO * 360.0)); // rad
     public static final double kFLYWHEEL_VEL_FACTOR_RAD = (kFLYWHEEL_POS_FACTOR_RAD/60.0); // rad/sec
 
-    public static final double kMAX_FLYWHEEL_VEL_RAD = 0.0; // rad/s
-    public static final double kMAX_FLYWHEEL_ACC_RAD = 0.0; // rad/s^2
+    public static final double kMAX_FLYWHEEL_VEL_RAD = Math.toRadians(0.0); // rad/s
+    public static final double kMAX_FLYWHEEL_ACC_RAD = Math.toRadians(0.0); // rad/s^2
 
     // Intake
     public static final int kINTAKE_PID_SLOT_ID = 0;
@@ -115,18 +121,18 @@ public class Constants {
 
     public static final int kINTAKE_CURRENT_LIMIT = 20;
 
-    public static final double kINTAKE_GEAR_RATIO = (1.0/3.0);
+    public static final double kINTAKE_GEAR_RATIO = (1.0/15.0);
     public static final double kINTAKE_POS_FACTOR_RAD = Math.toRadians(kINTAKE_GEAR_RATIO * 360.0); // rad
     public static final double kINTAKE_VEL_FACTOR_RAD = kINTAKE_POS_FACTOR_RAD/60.0; // rad/sec
 
-    public static final double kMAX_INTAKE_VEL_RAD = 0.0; // rad/s
-    public static final double kMAX_INTAKE_ACC_RAD = 0.0; // rad/s^2
+    public static final double kMAX_INTAKE_VEL_RAD = Math.toRadians(0.0); // rad/s
+    public static final double kMAX_INTAKE_ACC_RAD = Math.toRadians(0.0); // rad/s^2
 
     /// MUST BE LAST TO LOAD ///
     //// Subsystems ////
     public static final DriveTrain kDRIVE_TRAIN = new DriveTrain(false);
     public static final Arm kARM = new Arm(false);
-    public static final Wrist kWRIST = new Wrist(true);
+    public static final Wrist kWRIST = new Wrist(false);
     public static final FlyWheel kFLYWHEEL = new FlyWheel(false);
-    public static final Intake kINTAKE = new Intake(false);
+    public static final Intake kINTAKE = new Intake(true);
 }
