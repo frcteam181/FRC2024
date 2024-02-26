@@ -31,9 +31,9 @@ public class Intake extends SubsystemBase {
 
     // Tuning Param
     private ShuffleboardTab m_tab;
-    private GenericEntry e_setpointDeg, e_kP, e_kI, e_kD, e_kFF;
-    private double m_setpoint, m_setpointDeg, m_pidGoal, m_kP, m_kI, m_kD, m_kFF;
-    private double[] m_responseDeg;
+    private GenericEntry e_kP, e_kI, e_kD, e_kFF, e_userSetpoint;
+    private double m_setpoint, m_kP, m_kI, m_kD, m_kFF, m_userSetpoint;
+    private double[] m_response;
 
     public Intake(boolean isTuning) {
 
@@ -52,12 +52,12 @@ public class Intake extends SubsystemBase {
 
         m_pid = m_motor.getPIDController();
 
-        m_pid.setP(kINTAKE_GAINS.kP, kINTAKE_PID_SLOT_ID);
-        m_pid.setI(kINTAKE_GAINS.kI, kINTAKE_PID_SLOT_ID);
-        m_pid.setD(kINTAKE_GAINS.kD, kINTAKE_PID_SLOT_ID);
-        m_pid.setIZone(kINTAKE_GAINS.kIzone, kINTAKE_PID_SLOT_ID);
-        m_pid.setFF(kINTAKE_GAINS.kFF, kINTAKE_PID_SLOT_ID);
-        m_pid.setOutputRange(kINTAKE_GAINS.kMinOutput, kINTAKE_GAINS.kMaxOutput, kINTAKE_PID_SLOT_ID);
+        m_pid.setP(kINTAKE_GAINS.kP, kINTAKE_GAINS.kSlotID);
+        m_pid.setI(kINTAKE_GAINS.kI, kINTAKE_GAINS.kSlotID);
+        m_pid.setD(kINTAKE_GAINS.kD, kINTAKE_GAINS.kSlotID);
+        m_pid.setIZone(kINTAKE_GAINS.kIzone, kINTAKE_GAINS.kSlotID);
+        m_pid.setFF(kINTAKE_GAINS.kFF, kINTAKE_GAINS.kSlotID);
+        m_pid.setOutputRange(kINTAKE_GAINS.kMinOutput, kINTAKE_GAINS.kMaxOutput, kINTAKE_GAINS.kSlotID);
 
         //m_noteBeam = new DigitalInput(kNOTE_BEAM_CHANNEL);
         //m_hasNote = m_noteBeam.get();
@@ -70,55 +70,45 @@ public class Intake extends SubsystemBase {
 
     @Override
     public void periodic() {
-        m_pid.setReference(m_pidGoal, CANSparkBase.ControlType.kVelocity, kINTAKE_PID_SLOT_ID);
+
+        
+
+
+
+
+        m_pid.setReference(m_setpoint, CANSparkBase.ControlType.kVelocity, kINTAKE_GAINS.kSlotID);
         /* TUNING */
         if(m_isTuning) {periodicTuning();}
     }
 
     public void manualIntake(double vel) {
-        m_motor.set(vel);
+        //m_motor.set(vel);
     }
 
-    public void setVel(double vel) {
-        m_pidGoal = vel;
+    public void setVel(double RPM) {
+        m_setpoint = RPM;
     }
 
-    public Command setVelCommand(double vel) {
-        return Commands.runOnce(() -> setVel(vel), this);
+    public Command setVelCommand(double RPM) {
+        return Commands.runOnce(() -> setVel(RPM), this);
     }
 
-    public Command setTuningVelCommand() {
-        return Commands.runOnce(() -> setVel(m_setpoint), this);
+    public Command setUserSetpointCommand() {
+        return Commands.runOnce(() -> setVel(m_userSetpoint), this);
     }
 
     public double getSetpoint() {
         return m_setpoint;
     }
 
-    public double getSetpointDeg() {
-        return Math.toDegrees(getSetpoint());
-    }
-
-    public double getGoal() {
-        return m_pidGoal;
-    }
-
-    public double getGoalDeg() {
-        return Math.toDegrees(getGoal());
-    }
-
-    public double[] getResponseDeg() {
-        m_responseDeg[0] = getSetpointDeg();
-        m_responseDeg[1] = getVelDeg();
-        return m_responseDeg;
+    public double[] getResponse() {
+        m_response[0] = getSetpoint();
+        m_response[1] = getVel();
+        return m_response;
     }
 
     public double getVel() {
         return m_encoder.getVelocity();
-    }
-
-    public double getVelDeg() {
-        return Math.toDegrees(getVel());
     }
 
     public double getVoltage() {
@@ -134,10 +124,10 @@ public class Intake extends SubsystemBase {
     }
 
     public void updateGains() {
-        m_pid.setP(m_kP, kINTAKE_PID_SLOT_ID);
-        m_pid.setI(m_kI, kINTAKE_PID_SLOT_ID);
-        m_pid.setD(m_kD, kINTAKE_PID_SLOT_ID);
-        m_pid.setFF(m_kFF, kINTAKE_PID_SLOT_ID);
+        m_pid.setP(m_kP, kINTAKE_GAINS.kSlotID);
+        m_pid.setI(m_kI, kINTAKE_GAINS.kSlotID);
+        m_pid.setD(m_kD, kINTAKE_GAINS.kSlotID);
+        m_pid.setFF(m_kFF, kINTAKE_GAINS.kSlotID);
     }
 
     public void updateNow() {
@@ -174,9 +164,9 @@ public class Intake extends SubsystemBase {
         m_kFF = kINTAKE_GAINS.kFF;
 
         m_setpoint = 0;
-        m_setpointDeg = 0;
+        m_userSetpoint = 0;
 
-        m_responseDeg = new double[2];
+        m_response = new double[2];
 
         e_kP = m_tab.add("Proportional Gain", m_kP).withPosition(0, 0).getEntry();
         e_kI = m_tab.add("Integral Gain", m_kI).withPosition(0, 1).getEntry();
@@ -188,18 +178,18 @@ public class Intake extends SubsystemBase {
         m_tab.addNumber("kD", this::getKd).withPosition(1, 2);
         m_tab.addNumber("kFF", this::getKFF).withPosition(1, 3);
 
-        e_setpointDeg = m_tab.add("Setpoint Deg p sec", m_setpointDeg).withPosition(3, 0).getEntry();
-        m_tab.addNumber("Goal Deg p sec", this::getGoalDeg).withPosition(4, 0);
+        e_userSetpoint = m_tab.add("User Setpoint RPM", m_userSetpoint).withPosition(2, 0).withSize(2, 1).getEntry();
+        m_tab.addNumber("Setpoint RPM", this::getSetpoint).withPosition(4, 0);
 
-        m_tab.addDoubleArray("Response Deg p sec", this::getResponseDeg).withPosition(3,1).withSize(3,3).withWidget(BuiltInWidgets.kGraph);
+        m_tab.addDoubleArray("Response RPM", this::getResponse).withPosition(3,1).withSize(3,3).withWidget(BuiltInWidgets.kGraph);
 
-        // Left Telemetry
-        m_tab.addNumber("Volts (V)", this::getVoltage).withPosition(2, 1);
-        m_tab.addNumber("Amps (A)", this::getCurrent).withPosition(2, 2);
-        m_tab.addNumber("Temp (C)", this::getTemp).withPosition(2, 3);
+        //  Telemetry
+        m_tab.addNumber(" Volts (V)", this::getVoltage).withPosition(2, 1);
+        m_tab.addNumber(" Amps (A)", this::getCurrent).withPosition(2, 2);
+        m_tab.addNumber(" Temp (C)", this::getTemp).withPosition(2, 3);
 
         // Subsystem Telemetry
-        m_tab.addNumber("Velocity (deg p sec)", this::getVelDeg).withPosition(6, 0);
+        m_tab.addNumber("Velocity RPM", this::getVel).withPosition(5, 0);
         
     }
 
@@ -222,9 +212,9 @@ public class Intake extends SubsystemBase {
             m_updateNow = false;
         }
 
-        var setpointDeg = e_setpointDeg.getDouble(0);
+        var userSetpoint = e_userSetpoint.getDouble(0);
 
-        if(setpointDeg != m_setpointDeg) {m_setpointDeg = setpointDeg; m_setpoint = Math.toRadians(m_setpointDeg);}
+        if(userSetpoint != m_userSetpoint) {m_userSetpoint = userSetpoint;}
 
     }
     

@@ -38,9 +38,9 @@ public class Arm extends SubsystemBase {
 
     // Tuning Param
     private ShuffleboardTab m_tab;
-    private GenericEntry e_setpointDeg, e_kP, e_kI, e_kD, e_kKS, e_kKG, e_kKV;
-    private double m_setpoint, m_setpointDeg, m_kP, m_kI, m_kD, m_kKS, m_kKG, m_kKV;
-    private double[] m_responseDeg;
+    private GenericEntry e_posSetpointDeg, e_kP, e_kI, e_kD, e_kKS, e_kKG, e_kKV, e_userGoalDeg;
+    private double m_posSetpoint, m_velSetpoint, m_posSetpointDeg, m_kP, m_kI, m_kD, m_kKS, m_kKG, m_kKV, m_userGoal, m_userGoalDeg;
+    private double[] m_posResponseDeg, m_velResponseDeg;
 
     public Arm(boolean isTuning) {
 
@@ -62,17 +62,15 @@ public class Arm extends SubsystemBase {
         m_armFF = new ArmFeedforward(kARM_KS, kARM_KG, kARM_KV); // 0 rad should correspond to parallel to floor
         m_armFFValue = 0.0;
 
-        m_pid.setP(kARM_GAINS.kP, kARM_PID_SLOT_ID);
-        m_pid.setI(kARM_GAINS.kI, kARM_PID_SLOT_ID);
-        m_pid.setD(kARM_GAINS.kD, kARM_PID_SLOT_ID);
-        m_pid.setIZone(kARM_GAINS.kIzone, kARM_PID_SLOT_ID);
-        m_pid.setFF(kARM_GAINS.kFF, kARM_PID_SLOT_ID);
-        m_pid.setOutputRange(kARM_GAINS.kMinOutput, kARM_GAINS.kMaxOutput, kARM_PID_SLOT_ID);
+        m_pid.setP(kARM_GAINS.kP, kARM_GAINS.kSlotID);
+        m_pid.setI(kARM_GAINS.kI, kARM_GAINS.kSlotID);
+        m_pid.setD(kARM_GAINS.kD, kARM_GAINS.kSlotID);
+        m_pid.setIZone(kARM_GAINS.kIzone, kARM_GAINS.kSlotID);
+        m_pid.setFF(kARM_GAINS.kFF, kARM_GAINS.kSlotID);
+        m_pid.setOutputRange(kARM_GAINS.kMinOutput, kARM_GAINS.kMaxOutput, kARM_GAINS.kSlotID);
 
         m_leftMotor.setSmartCurrentLimit(kLEFT_ARM_CURRENT_LIMIT);
         m_rightMotor.setSmartCurrentLimit(kRIGHT_ARM_CURRENT_LIMIT);
-
-        m_rightMotor.setOpenLoopRampRate(1);
 
         m_leftMotor.follow(m_rightMotor, true);
 
@@ -81,7 +79,7 @@ public class Arm extends SubsystemBase {
 
         /* Trapezoid Profile */
 
-        m_constraints = new TrapezoidProfile.Constraints(kMAX_ARM_VEL_RAD, kMAX_ARM_ACC_RAD); // rad/s & rad/s^2
+        m_constraints = new TrapezoidProfile.Constraints(kARM_GAINS.kMaxVel, kARM_GAINS.kMaxAcc); // rad/s & rad/s^2
 
         m_armProfile = new TrapezoidProfile(m_constraints);
 
@@ -102,7 +100,6 @@ public class Arm extends SubsystemBase {
     public void periodic() {
 
         m_state = m_armProfile.calculate(m_period, m_state, m_goal);
-        //m_armFFValue = m_armFF.calculate(getPos(), getSpeed());
 
         if (m_enabled) {
             useState(m_state);
@@ -116,17 +113,21 @@ public class Arm extends SubsystemBase {
     // Trapezoid Methods
 
     public void useState(TrapezoidProfile.State state) {
-        m_setpoint = (state.position - kZERO_ARM); // Corrected to account for abs encoder not being at exactly zero
-        m_armFFValue = m_armFF.calculate(m_setpoint, state.velocity);
-        m_pid.setReference(state.position, CANSparkBase.ControlType.kPosition, kARM_PID_SLOT_ID, m_armFFValue);
+        var err = 0.5;
+        m_posSetpoint = (state.position - kZERO_ARM); // Corrected to account for abs encoder not being at exactly zero
+        m_velSetpoint = (state.velocity);
+        m_armFFValue = m_armFF.calculate(m_posSetpoint, state.velocity);
+        m_pid.setReference(state.position, CANSparkBase.ControlType.kPosition, kARM_GAINS.kSlotID, m_armFFValue);
+        if((m_goal.position > (m_state.position - Math.toRadians(err))) && (m_goal.position < (m_state.position + Math.toRadians(err)))) {m_enabled = false;}
     }
 
     public void setGoal(TrapezoidProfile.State goal) {
-        m_goal = goal;
+        m_enabled = true;
+        m_goal = new TrapezoidProfile.State(clamp(goal.position, kMIN_ARM_POS_RAD, kMAX_ARM_POS_RAD) + kZERO_ARM, goal.velocity);
     }
 
     public void setGoal(double pos) {
-        m_goal = new TrapezoidProfile.State((pos + kZERO_ARM), 0.0);
+        setGoal(new TrapezoidProfile.State(pos, 0.0));
     }
 
     public Command setGoalCommand(TrapezoidProfile.State goal) {
@@ -135,6 +136,10 @@ public class Arm extends SubsystemBase {
 
     public Command setGoalCommand(double pos) {
         return Commands.runOnce(() -> setGoal(pos), this);
+    }
+
+    public Command setUserGoalCommand() {
+        return Commands.runOnce(() -> setGoal(m_userGoal), this);
     }
 
     // Class Methods
@@ -155,12 +160,12 @@ public class Arm extends SubsystemBase {
         m_rightMotor.set(0.0);
     }
 
-    public double getSetpoint() {
-        return m_setpoint;
+    public double getPosSetpoint() {
+        return m_posSetpoint;
     }
 
-    public double getSetpointDeg() {
-        return Math.toDegrees(getSetpoint());
+    public double getPosSetpointDeg() {
+        return Math.toDegrees(getPosSetpoint());
     }
 
     public double getPos() {
@@ -171,18 +176,32 @@ public class Arm extends SubsystemBase {
         return Math.toDegrees(getPos());
     }
 
-    public double[] getResponseDeg() {
-        m_responseDeg[0] = getSetpointDeg();
-        m_responseDeg[1] = getPosDeg();
-        return m_responseDeg;
+    public double[] getPosResponseDeg() {
+        m_posResponseDeg[0] = getPosSetpointDeg();
+        m_posResponseDeg[1] = getPosDeg();
+        return m_posResponseDeg;
     }
 
-    public double getSpeed() {
+    public double[] getVelResponseDeg() {
+        m_velResponseDeg[0] = getVelSetpointDeg();
+        m_velResponseDeg[1] = getVel();
+        return m_velResponseDeg;
+    }
+
+    public double getVelSetpoint() {
+        return m_velSetpoint;
+    }
+
+    public double getVelSetpointDeg() {
+        return Math.toDegrees(getVelSetpoint());
+    }
+
+    public double getVel() {
         return m_encoder.getVelocity();
     }
 
-    public double getSpeedDeg() {
-        return Math.toDegrees(getSpeed());
+    public double getVelDeg() {
+        return Math.toDegrees(getVel());
     }
 
     public double getLeftVoltage() {
@@ -209,20 +228,11 @@ public class Arm extends SubsystemBase {
         return m_rightMotor.getMotorTemperature();
     }
 
-    public void goTo(double setpointRad) {
-        m_setpoint = setpointRad;
-        //m_pid.setReference(setpointRad, CANSparkBase.ControlType.kPosition, kARM_PID_SLOT_ID, m_armFFValue);
-    }
-
-    public Command goToCommand(double setgoalRad) {
-        return Commands.runOnce(() -> goTo(setgoalRad), this);
-    }
-
     public void updateGains() {
         m_armFF = new ArmFeedforward(m_kKS, m_kKG, m_kKV);
-        m_pid.setP(m_kP, kARM_PID_SLOT_ID);
-        m_pid.setI(m_kI, kARM_PID_SLOT_ID);
-        m_pid.setD(m_kD, kARM_PID_SLOT_ID);
+        m_pid.setP(m_kP, kARM_GAINS.kSlotID);
+        m_pid.setI(m_kI, kARM_GAINS.kSlotID);
+        m_pid.setD(m_kD, kARM_GAINS.kSlotID);
     }
 
     public void updateNow() {
@@ -261,6 +271,19 @@ public class Arm extends SubsystemBase {
         return m_armFFValue;
     }
 
+    public double clamp(double value, double MIN, double MAX) {
+        if(value > MAX) {
+            return MAX;
+        } else if(value < MIN) {
+            return MIN;
+        }
+        return value;
+    }
+
+    public boolean isEnabled() {
+        return m_enabled;
+    }
+
     public void tune() {
 
         m_tab = Shuffleboard.getTab("Arm Tuner");
@@ -269,47 +292,56 @@ public class Arm extends SubsystemBase {
         m_kI = kARM_GAINS.kI;
         m_kD = kARM_GAINS.kD;
 
-        m_setpoint = 0;
-        m_setpointDeg = 0;
+        m_userGoalDeg = 0;
 
-        m_responseDeg = new double[2];
+        m_posSetpoint = 0;
+        m_posSetpointDeg = 0;
 
-        e_kP = m_tab.add("Proportional Gain", m_kP).withPosition(0, 0).getEntry();
-        e_kI = m_tab.add("Integral Gain", m_kI).withPosition(0, 1).getEntry();
-        e_kD = m_tab.add("Derivative Gain", m_kD).withPosition(0, 2).getEntry();
+        m_velSetpoint = 0;
+
+        m_posResponseDeg = new double[2];
+        m_velResponseDeg = new double[2];
+
+        e_kP = m_tab.add("Set kP", m_kP).withPosition(0, 0).getEntry();
+        e_kI = m_tab.add("Set kI", m_kI).withPosition(0, 1).getEntry();
+        e_kD = m_tab.add("Set kD", m_kD).withPosition(0, 2).getEntry();
 
         m_tab.addNumber("Kp", this::getKp).withPosition(1, 0);
         m_tab.addNumber("Ki", this::getKi).withPosition(1, 1);
         m_tab.addNumber("Kd", this::getKd).withPosition(1, 2);
 
-        e_setpointDeg = m_tab.add("Setpoint Deg", m_setpointDeg).withPosition(3, 0).getEntry();
-        m_tab.addNumber("Set Setpoint Deg", this::getSetpointDeg).withPosition(4, 0);
+        e_userGoalDeg = m_tab.add("User Goal (Deg)", m_userGoalDeg).withPosition(3, 0).getEntry();
+        m_tab.addNumber("SetPos (Deg)", this::getPosSetpointDeg).withPosition(4, 0);
 
-        m_tab.addDoubleArray("Response Deg", this::getResponseDeg).withPosition(3,1).withSize(3,3).withWidget(BuiltInWidgets.kGraph);
+        m_tab.addDoubleArray("Response (Deg)", this::getPosResponseDeg).withPosition(3,1).withSize(3,3).withWidget(BuiltInWidgets.kGraph);
+        m_tab.addDoubleArray("Response (Deg:sec)", this::getVelResponseDeg).withPosition(7,1).withSize(3,3).withWidget(BuiltInWidgets.kGraph);
 
         // Left Telemetry
-        m_tab.addNumber("Left Volts (V)", this::getLeftVoltage).withPosition(2, 1);
-        m_tab.addNumber("Left Amps (A)", this::getLeftCurrent).withPosition(2, 2);
-        m_tab.addNumber("Left Temp (C)", this::getLeftTemp).withPosition(2, 3);
+        m_tab.addNumber("L.Volts (V)", this::getLeftVoltage).withPosition(2, 1);
+        m_tab.addNumber("L.Amps (A)", this::getLeftCurrent).withPosition(2, 2);
+        m_tab.addNumber("L.Temp (C)", this::getLeftTemp).withPosition(2, 3);
 
         // Right Telemetry
-        m_tab.addNumber("Right Volts (V)", this::getRightVoltage).withPosition(6, 1);
-        m_tab.addNumber("Right Amps (A)", this::getRightCurrent).withPosition(6, 2);
-        m_tab.addNumber("Right Temp (C)", this::getRightTemp).withPosition(6, 3);
+        m_tab.addNumber("R.Volts (V)", this::getRightVoltage).withPosition(6, 1);
+        m_tab.addNumber("R.Amps (A)", this::getRightCurrent).withPosition(6, 2);
+        m_tab.addNumber("R.Temp (C)", this::getRightTemp).withPosition(6, 3);
 
         // Subsystem Telemetry
-        m_tab.addNumber("Position (deg)", this::getPosDeg).withPosition(5, 0);
-        m_tab.addNumber("Speed (deg p sec)", this::getSpeedDeg).withPosition(6, 0);
+        m_tab.addNumber("Pos (deg)", this::getPosDeg).withPosition(5, 0);
+        m_tab.addNumber("Vel (deg:sec)", this::getVelDeg).withPosition(8, 0);
+        m_tab.addNumber("Set Vel (deg:sec)", this::getVelSetpointDeg).withPosition(7, 0);
 
-        e_kKS = m_tab.add("Static Gain", m_kKS).withPosition(7, 0).getEntry();
-        e_kKG = m_tab.add("Gravity Gain", m_kKG).withPosition(7, 1).getEntry();
-        e_kKV = m_tab.add("Velocity Gain", m_kKV).withPosition(7, 2).getEntry();
+        e_kKS = m_tab.add("Set kS", m_kKS).withPosition(10, 0).getEntry();
+        e_kKG = m_tab.add("Set kG", m_kKG).withPosition(10, 1).getEntry();
+        e_kKV = m_tab.add("Set kV", m_kKV).withPosition(10, 2).getEntry();
 
-        m_tab.addNumber("kS", this::getKKS).withPosition(8, 0);
-        m_tab.addNumber("kG", this::getKKG).withPosition(8, 1);
-        m_tab.addNumber("kV", this::getKKV).withPosition(8, 2);
+        m_tab.addNumber("kS", this::getKKS).withPosition(11, 0);
+        m_tab.addNumber("kG", this::getKKG).withPosition(11, 1);
+        m_tab.addNumber("kV", this::getKKV).withPosition(11, 2);
 
         m_tab.addNumber("FF Value", this::getFFValue).withPosition(9, 0);
+
+        m_tab.addBoolean("isEnabled", this::isEnabled).withPosition(6,0).withSize(1, 1);
 
     }
 
@@ -338,9 +370,9 @@ public class Arm extends SubsystemBase {
             m_updateNow = false;
         }
 
-        //var setpointDeg = e_setpointDeg.getDouble(0);
+        var userGoalDeg = e_userGoalDeg.getDouble(0);
 
-        //if(setpointDeg != m_setpointDeg) {m_setpointDeg = setpointDeg; m_setpoint = Math.toRadians(setpointDeg);}
+        if(userGoalDeg != m_userGoalDeg) {m_userGoalDeg = userGoalDeg; m_userGoal = Math.toRadians(userGoalDeg);}
 
     }
     

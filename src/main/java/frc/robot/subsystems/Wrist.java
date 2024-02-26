@@ -54,12 +54,12 @@ public class Wrist extends SubsystemBase {
         m_pid = m_rightWrist.getPIDController();
         m_pid.setFeedbackDevice(m_encoder);
 
-        m_pid.setP(kWRIST_GAINS.kP, kWRIST_PID_SLOT_ID);
-        m_pid.setI(kWRIST_GAINS.kI, kWRIST_PID_SLOT_ID);
-        m_pid.setD(kWRIST_GAINS.kD, kWRIST_PID_SLOT_ID);
-        m_pid.setIZone(kWRIST_GAINS.kIzone, kWRIST_PID_SLOT_ID);
-        m_pid.setFF(kWRIST_GAINS.kFF, kWRIST_PID_SLOT_ID);
-        m_pid.setOutputRange(kWRIST_GAINS.kMinOutput, kWRIST_GAINS.kMaxOutput, kWRIST_PID_SLOT_ID);
+        m_pid.setP(kWRIST_GAINS.kP, kWRIST_GAINS.kSlotID);
+        m_pid.setI(kWRIST_GAINS.kI, kWRIST_GAINS.kSlotID);
+        m_pid.setD(kWRIST_GAINS.kD, kWRIST_GAINS.kSlotID);
+        m_pid.setIZone(kWRIST_GAINS.kIzone, kWRIST_GAINS.kSlotID);
+        m_pid.setFF(kWRIST_GAINS.kFF, kWRIST_GAINS.kSlotID);
+        m_pid.setOutputRange(kWRIST_GAINS.kMinOutput, kWRIST_GAINS.kMaxOutput, kWRIST_GAINS.kSlotID);
 
         m_leftWrist.setSmartCurrentLimit(kLEFT_WRIST_CURRENT_LIMIT);
         m_rightWrist.setSmartCurrentLimit(kRIGHT_WRIST_CURRENT_LIMIT);
@@ -71,14 +71,14 @@ public class Wrist extends SubsystemBase {
 
         /* Trapezoid Profile */
 
-        m_constraints = new TrapezoidProfile.Constraints(kMAX_WRIST_VEL_RAD, kMAX_WRIST_ACC_RAD); // rad/s & rad/s^2
+        m_constraints = new TrapezoidProfile.Constraints(kWRIST_GAINS.kMaxVel, kWRIST_GAINS.kMaxAcc); // rad/s & rad/s^2
 
         m_wristProfile = new TrapezoidProfile(m_constraints);
 
         m_state = new TrapezoidProfile.State(kZERO_WRIST, 0.0);
         m_goal = new TrapezoidProfile.State(kZERO_WRIST, 0.0);
 
-        m_enabled = true;
+        m_enabled = false;
 
         m_period = 0.02;
 
@@ -103,8 +103,10 @@ public class Wrist extends SubsystemBase {
     // Trapezoid Methods
 
     public void useState(TrapezoidProfile.State state) {
+        var err = 0.5;
         m_setpoint = (state.position - kZERO_WRIST);
-        m_pid.setReference(state.position, CANSparkBase.ControlType.kPosition, kWRIST_PID_SLOT_ID);
+        m_pid.setReference(state.position, CANSparkBase.ControlType.kPosition, kWRIST_GAINS.kSlotID);
+        if((m_goal.position > (m_state.position - Math.toRadians(err))) && (m_goal.position < (m_state.position + Math.toRadians(err)))) {m_enabled = false;}
     }
 
     public void setGoal(TrapezoidProfile.State goal) {
@@ -201,9 +203,9 @@ public class Wrist extends SubsystemBase {
     }
 
     public void updateGains() {
-        m_pid.setP(m_kP, kARM_PID_SLOT_ID);
-        m_pid.setI(m_kI, kARM_PID_SLOT_ID);
-        m_pid.setD(m_kD, kARM_PID_SLOT_ID);
+        m_pid.setP(m_kP, kWRIST_GAINS.kSlotID);
+        m_pid.setI(m_kI, kWRIST_GAINS.kSlotID);
+        m_pid.setD(m_kD, kWRIST_GAINS.kSlotID);
     }
 
     public void updateNow() {
@@ -224,6 +226,21 @@ public class Wrist extends SubsystemBase {
 
     public double getKd() {
         return m_kD;
+    }
+
+    public boolean isEnabled() {
+        return m_enabled;
+    }
+
+    public boolean checkIfSafeCommand() {
+        return true;
+    }
+
+    public boolean checkIfHome() {
+        if (getPos() > Math.toRadians(-1) && getPos() < Math.toRadians(1)) {
+            return true;
+        }
+        return false;
     }
 
     /* TUNING */
@@ -267,6 +284,8 @@ public class Wrist extends SubsystemBase {
         // Subsystem Telemetry
         m_tab.addNumber("Position (deg)", this::getPosDeg).withPosition(5, 0);
         m_tab.addNumber("Velocity (deg p sec)", this::getVel).withPosition(6, 0);
+
+        m_tab.addBoolean("isEnabled", this::isEnabled).withPosition(6,0).withSize(1, 1);
         
     }
 

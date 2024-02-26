@@ -6,11 +6,13 @@ import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.arm_actions.moveArmDown;
+import frc.robot.commands.arm_actions.moveArmTo;
 import frc.robot.commands.arm_actions.moveArmUp;
 import frc.robot.commands.defaults.DefaultArm;
 import frc.robot.commands.defaults.DefaultFlyWheel;
 import frc.robot.commands.defaults.DefaultIntake;
 import frc.robot.commands.defaults.DefaultWrist;
+import frc.robot.commands.presets.intake_preset;
 import frc.robot.commands.wrist_actions.tiltWristDown;
 import frc.robot.commands.wrist_actions.tiltWristUp;
 import frc.robot.subsystems.Arm;
@@ -75,22 +77,30 @@ public class OperatorController {
         //m_cPS4.onTrue(new moveArmDown());
         //m_xPS4.onTrue(new moveArmUp());
 
-        m_cPS4.onTrue(m_wrist.setGoalCommand(Math.toRadians(50)));
-        m_tPS4.onTrue(m_wrist.setGoalCommand(Math.toRadians(0)));
+        //m_cPS4.onTrue(m_wrist.setGoalCommand(Math.toRadians(50)));
+        //m_tPS4.onTrue(m_wrist.setGoalCommand(Math.toRadians(0)));
         //m_sPS4.onTrue(m_wrist.setGoalCommand(Math.toRadians(-100)));
 
-        m_rbPS4.onTrue(m_arm.setGoalCommand(Math.toRadians(85)));
+        m_rbPS4.onTrue(m_arm.setGoalCommand(Math.toRadians(45)));
         m_lbPS4.onTrue(m_arm.setGoalCommand(Math.toRadians(0)));
 
+        m_cPS4.onTrue(new intake_preset());
+
+        //m_sPS4.onTrue(m_arm.setUserGoalCommand());
+
         //m_sharePS4.whileTrue(new tiltWristDown());
-        //m_xPS4.whileTrue(new tiltWristUp());
+        //m_optionsPS4.whileTrue(new tiltWristUp());
+
+        //m_sPS4.onTrue(m_intake.setVelCommand(5000.0));
+        //m_xPS4.onTrue(m_intake.setVelCommand(0.0));
 
         //m_optionsPS4.onTrue(m_arm.updateNowCommand()); //arm
         //m_optionsPS4.onTrue(m_wrist.updateNowCommand()); //wrist
-        m_optionsPS4.onTrue(m_intake.updateNowCommand()); //intake
+        //m_optionsPS4.onTrue(m_intake.updateNowCommand()); //intake
+        //m_optionsPS4.onTrue(m_intake.updateNowCommand()); //Flywheel
 
-        m_sPS4.onTrue(m_intake.setTuningVelCommand());
-        m_xPS4.onTrue(m_intake.setVelCommand(Math.toRadians(0)));
+        //m_sPS4.onTrue(m_intake.setTuningVelCommand());
+        //m_xPS4.onTrue(m_intake.setVelCommand(Math.toRadians(0)));
 
     }
 
@@ -114,8 +124,6 @@ public class OperatorController {
 
         m_x.whileTrue(new moveArmDown());
         m_y.whileTrue(new moveArmUp());
-        m_b.onTrue(m_arm.goToCommand(Math.toRadians(90)));
-        m_a.onTrue(m_arm.goToCommand(Math.toRadians(0)));
 
         m_lb.whileTrue(new tiltWristDown());
         m_rb.whileTrue(new tiltWristUp());
