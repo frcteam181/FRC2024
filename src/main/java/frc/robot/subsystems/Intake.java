@@ -29,8 +29,6 @@ public class Intake extends SubsystemBase {
 
     private DigitalInput m_noteBeam;
 
-    private double m_feedPower;
-
     // Tuning Param
     private ShuffleboardTab m_tab;
     private GenericEntry e_kP, e_kI, e_kD, e_kFF, e_userSetpoint;
@@ -61,10 +59,8 @@ public class Intake extends SubsystemBase {
         m_pid.setOutputRange(kINTAKE_GAINS.kMinOutput, kINTAKE_GAINS.kMaxOutput, kINTAKE_GAINS.kSlotID);
 
         m_noteBeam = new DigitalInput(1);
-        m_noteBeam = new DigitalInput(2);
         m_hasNote = m_noteBeam.get();
         m_isFeeding = false;
-        m_feedPower = 3500.0; // RPM
 
         /* Tuning */
         m_isTuning = isTuning;
@@ -77,7 +73,7 @@ public class Intake extends SubsystemBase {
         if(!m_isFeeding) {
             m_pid.setReference(m_setpoint, CANSparkBase.ControlType.kVelocity, kINTAKE_GAINS.kSlotID);
         } else {
-            m_pid.setReference(m_feedPower, CANSparkBase.ControlType.kVelocity, kINTAKE_GAINS.kSlotID);
+            m_pid.setReference(kINTAKE_FEED_POWER, CANSparkBase.ControlType.kVelocity, kINTAKE_GAINS.kSlotID);
         }
         m_hasNote = m_noteBeam.get();
         /* TUNING */

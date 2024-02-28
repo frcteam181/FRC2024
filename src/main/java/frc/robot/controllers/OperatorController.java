@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.commands.arm_actions.moveArmDown;
-import frc.robot.commands.arm_actions.moveArmTo;
 import frc.robot.commands.arm_actions.moveArmUp;
 import frc.robot.commands.defaults.DefaultArm;
 import frc.robot.commands.defaults.DefaultFlyWheel;
@@ -91,11 +90,11 @@ public class OperatorController {
     public void bindPS4Buttons() {
         
         // COMPETITION (DO NOT CHANGE)
-        //m_tPS4.whileTrue(new feedFlywheel());                       // Feed Flywheels
+        m_tPS4.whileTrue(new feedFlywheel());                       // Feed Flywheels
         //m_rbPS4.and(m_tPS4).whileTrue(new feedFlywheel());                       // Feed Flywheels
-        //m_xPS4.onTrue(new toggleFlywheel());                        // Start Flywheels
+        m_xPS4.onTrue(new toggleFlywheel());                        // Start Flywheels
         //m_rbPS4.and(m_xPS4).onTrue(new toggleFlywheel());                        // Start Flywheels
-        //m_xPS4.onTrue(m_flyWheel.setVelCommand(5000)).onFalse(m_flyWheel.setVelCommand(0));
+        //m_xPS4.onTrue(new toggleFlywheel());
 
         m_sPS4.onTrue(new front_amp_preset());                      // Front Amp
         m_cPS4.onTrue(new back_amp_preset());                       // Back Amp

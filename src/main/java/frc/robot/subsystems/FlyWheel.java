@@ -73,14 +73,9 @@ public class FlyWheel extends SubsystemBase {
 
     @Override
     public void periodic() {
-        var err = 100;
-
         m_pid.setReference(m_setpoint, CANSparkBase.ControlType.kVelocity, kFLYWHEEL_GAINS.kSlotID);
 
-        if((m_setpoint > (m_setpoint - Math.toRadians(err))) 
-            && 
-            (m_setpoint < (m_setpoint + Math.toRadians(err)))) 
-        {m_status = FlyWheelStatus.READY;}
+        m_status = FlyWheelStatus.READY;
 
         /* TUNING */
         if(m_isTuning) {periodicTuning();}
@@ -129,8 +124,10 @@ public class FlyWheel extends SubsystemBase {
     public void toggleFlywheel() {
         if(m_isOn) {
             setVel(0.0);
+            m_isOn = !m_isOn;
         } else {
-            setVel(4000.0);
+            setVel(60000.0);
+            m_isOn = !m_isOn;
         }
     }
 

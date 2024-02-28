@@ -13,8 +13,6 @@ public class feedFlywheel extends Command {
 
         m_intake = kINTAKE;
 
-        addRequirements(m_intake);
-
     }
 
     @Override

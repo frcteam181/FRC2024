@@ -110,6 +110,8 @@ public class Constants {
     public static final double kFLYWHEEL_POS_FACTOR_RAD = 1; // RPM
     public static final double kFLYWHEEL_VEL_FACTOR_RAD = 1; // RPM
 
+    public static final double kFLYWHEEL_SHOOT_POWER = 0;
+
     // Intake
     public static final Gains kINTAKE_GAINS = new Gains(0.00002, 0.0, 0.0/*0.0025*/, 0.0001, 0, -1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0);
 
@@ -118,10 +120,13 @@ public class Constants {
     public static final double kINTAKE_POS_FACTOR_RAD = 1; // RPM
     public static final double kINTAKE_VEL_FACTOR_RAD = 1; // RPM
 
+    public static final double kINTAKE_POWER = 90000.0;
+    public static final double kINTAKE_FEED_POWER = 3500.0;
+
     //Presets
 
     public static final PresetValues kINTAKE_PRESET = new PresetValues(0.0, 0.0, true);
-    public static final PresetValues kSTOW_AWAY_PRESET = new PresetValues(0, 50, true);
+    public static final PresetValues kSTOW_AWAY_PRESET = new PresetValues(-2.4, 16.5, true);
     
     public static final PresetValues kBACK_AMP_PRESET = new PresetValues(5.6, 94.5, true);
     public static final PresetValues kFORWARD_AMP_PRESET = new PresetValues(-0.7, 49.0, true);
@@ -136,5 +141,5 @@ public class Constants {
     public static final Arm kARM = new Arm(false);
     public static final Wrist kWRIST = new Wrist(false);
     public static final FlyWheel kFLYWHEEL = new FlyWheel(false);
-    public static final Intake kINTAKE = new Intake(false);
+    public static final Intake kINTAKE = new Intake(true);
 }

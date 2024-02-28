@@ -3,29 +3,29 @@ package frc.robot.commands.intake_actions;
 import static frc.robot.Constants.*;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.FlyWheel;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Wrist;
 
 public class teleIntake extends Command {
 
     public enum IntakeState {
-        IDLE, INTAKING, ADJUSTING, LOADED, SPEEDING_UP, READY, SHOOTING
+        IDLE, INTAKING, LOADED, SPEEDING_UP, READY, SHOOTING
     }
 
     private Intake m_intake;
     private FlyWheel m_flywheel;
-    private IntakeState m_intakeState;
-
-    private double m_a, m_b, m_spitDistance;
+    private IntakeState m_intakeState, m_previousState;
+    private Arm m_arm;
+    private Wrist m_wrist;
 
     public teleIntake() {
 
         m_intake = kINTAKE;
         m_flywheel = kFLYWHEEL;
-
-        m_a = 0;
-        m_b = 0;
-        m_spitDistance = 1.5; //in
+        m_arm = kARM;
+        m_wrist = kWRIST;
 
         addRequirements(m_intake, m_flywheel);
 
@@ -34,6 +34,7 @@ public class teleIntake extends Command {
     @Override
     public void initialize() {
         m_intakeState = IntakeState.INTAKING;
+        m_previousState = IntakeState.IDLE;
     }
 
     @Override
@@ -46,36 +47,30 @@ public class teleIntake extends Command {
 
             case INTAKING:
                 System.out.println("TeleIntake - INTAKING");
-                m_intake.setVel(4000);
+                m_intake.setVel(kINTAKE_POWER);
                 if(m_intake.hasNote()) {
-                    //m_intake.setVel(-500);
-                    //m_intake.setVelCommand(-500);
-                    //m_a = m_intake.getPosIn();
-                    m_intakeState = IntakeState.ADJUSTING;
-                }
-                break;
-
-            case ADJUSTING:
-                System.out.println("TeleIntake - ADJUSTING");
-                m_b = m_intake.getPosIn();
-                if(m_b - m_a >= m_spitDistance) {
                     m_intake.setVel(0);
+                    m_arm.setGoal(kSTOW_AWAY_PRESET.kArmPos);
+                    m_previousState = m_intakeState;
                     m_intakeState = IntakeState.LOADED;
                 }
                 break;
 
-            case LOADED: // 1 = Speeding Up
+            case LOADED: 
                 System.out.println("TeleIntake - LOADED");
-                if(m_flywheel.getStatus() == 1) {
+                if(m_flywheel.getStatus() == 1) {                   // <------ 1 = Speeding Up
+                    m_previousState = m_intakeState;
                     m_intakeState = IntakeState.SPEEDING_UP;
                 }
                 break;
 
-            case SPEEDING_UP: // 2 = Ready
+            case SPEEDING_UP: 
                 System.out.println("TeleIntake - SPEEDING_UP");
-                if(m_flywheel.getStatus() == 2) {
+                if(m_flywheel.getStatus() == 2) {                   // <------ // 2 = Ready
+                    m_previousState = m_intakeState;
                     m_intakeState = IntakeState.READY;
                 } else if (m_flywheel.getStatus() == 0) {
+                    m_previousState = m_intakeState;
                     m_intakeState = IntakeState.LOADED;
                 }
                 break;
@@ -83,16 +78,24 @@ public class teleIntake extends Command {
             case READY:
                 System.out.println("TeleIntake - READY");
                 if(m_intake.isFeeding()) {
+                    m_previousState = m_intakeState;
                     m_intakeState = IntakeState.SHOOTING;
                 } else if (m_flywheel.getStatus() == 0) {
+                    m_previousState = m_intakeState;
                     m_intakeState = IntakeState.LOADED;
                 } else if (m_flywheel.getStatus() == 1) {
+                    m_previousState = m_intakeState;
                     m_intakeState = IntakeState.SPEEDING_UP;
                 }
                 break;
 
             case SHOOTING:
                 System.out.println("TeleIntake - SHOOTING");
+                if(!m_intake.hasNote() && m_previousState == IntakeState.READY) {
+                    m_flywheel.toggleFlywheel();
+                    m_wrist.setGoal(kSTOW_AWAY_PRESET.kWristPos);
+                    m_intakeState = IntakeState.IDLE;
+                }
                 break;
         
         
@@ -105,7 +108,14 @@ public class teleIntake extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        m_flywheel.toggleFlywheel();
+        System.out.println("TeleIntake - ENDED");
+        if(m_intakeState == IntakeState.INTAKING) {
+            System.out.println("TeleIntake - Intake Stopped");
+            m_intake.setVel(0);
+        } else if(m_intakeState == IntakeState.SPEEDING_UP || m_intakeState == IntakeState.READY) {
+            System.out.println("TeleIntake - Flywheel Stopped");
+            m_flywheel.toggleFlywheel();
+        }
     }
     
 }

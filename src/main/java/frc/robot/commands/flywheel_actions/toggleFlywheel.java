@@ -13,8 +13,6 @@ public class toggleFlywheel extends Command {
 
         m_flywheel = kFLYWHEEL;
 
-        addRequirements(m_flywheel);
-
     }
 
     @Override
