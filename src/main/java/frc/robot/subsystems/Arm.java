@@ -10,6 +10,9 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -31,10 +34,12 @@ public class Arm extends SubsystemBase {
     private TrapezoidProfile.State m_start, m_state, m_goal;
     private TrapezoidProfile m_armProfile;
 
-    private boolean m_enabled, m_isTuning, m_updateNow, m_enabledTest;
+    private boolean m_enabled, m_isTuning, m_updateNow, m_locked;
     private double m_period, m_armFFValue;
 
     private ArmFeedforward m_armFF;
+
+    private DoubleSolenoid m_piston;
 
     // Tuning Param
     private ShuffleboardTab m_tab;
@@ -89,6 +94,10 @@ public class Arm extends SubsystemBase {
         m_enabled  = false;
 
         m_period = 0.02;
+
+        m_piston = new DoubleSolenoid(PneumaticsModuleType.REVPH, kLOCK_CHANNEL, kUNLOCK_CHANNEL);
+
+        m_locked = false;
 
         /* Tuning */
         m_isTuning = isTuning;
@@ -282,6 +291,20 @@ public class Arm extends SubsystemBase {
 
     public boolean isEnabled() {
         return m_enabled;
+    }
+
+    public void switchLockClimb() {
+        if(m_locked) {
+            m_piston.set(Value.kForward);
+            m_locked = false;
+        } else {
+            m_piston.set(Value.kReverse);
+            m_locked = true;
+        }
+    }
+
+    public Command switchLockClimbCommand() {
+        return Commands.runOnce(() -> switchLockClimb(), this);
     }
 
     public void tune() {
