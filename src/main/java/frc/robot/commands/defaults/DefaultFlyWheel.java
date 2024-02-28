@@ -39,7 +39,7 @@ public class DefaultFlyWheel extends Command {
         } else {
             m_speed = m_controllerXbox.getRightY();
         }
-        m_flyWheel.shoot(m_speed);
+        m_flyWheel.setSpeed(m_speed);
 
     }
     

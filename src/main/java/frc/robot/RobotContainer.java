@@ -19,7 +19,7 @@ public class RobotContainer {
 
   public RobotContainer() {
 
-    m_driverController = new DriverController(false, true, false, false);
+    m_driverController = new DriverController(true, false, true, false);
     m_operatorController = new OperatorController(true);
 
     configureBindings();

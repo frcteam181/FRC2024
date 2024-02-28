@@ -1,6 +1,6 @@
 package frc.robot.commands.wrist_actions;
 
-import static frc.robot.Constants.*;
+import static frc.robot.Constants.kWRIST;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Wrist;
@@ -21,13 +21,13 @@ public class moveWristTo extends Command {
 
     @Override
     public void initialize() {
-        System.out.println("moveWristTo() initialized");
+        System.out.println("moveWristTo("+ m_goalPos +") initialized");
         m_wrist.setGoal(m_goalPos);
     }
 
     @Override
     public void end(boolean interrupted) {
-        System.out.println("moveWristTo() ended");
+        System.out.println("moveWristTo("+ m_goalPos +") ended");
     }
 
     @Override

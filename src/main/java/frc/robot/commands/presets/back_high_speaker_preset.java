@@ -9,20 +9,20 @@ import frc.robot.commands.wrist_actions.moveWristTo;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Wrist;
 
-public class forward_amp extends ParallelCommandGroup {
+public class back_high_speaker_preset extends ParallelCommandGroup {
 
     private Arm m_arm;
     private Wrist m_wrist;
 
-    public forward_amp() {
+    public back_high_speaker_preset() {
 
         m_arm = kARM;
         m_wrist = kWRIST;
 
         addCommands(
             new SequentialCommandGroup(
-                new moveArmTo(kFORWARD_AMP_PRESET.kArmPos),
-                new moveWristTo(kFORWARD_AMP_PRESET.kWristPos)
+                new moveArmTo(kBACK_HIGH_SPEAKER_PRESET.kArmPos),
+                new moveWristTo(kBACK_HIGH_SPEAKER_PRESET.kWristPos)
             )
         );
     }

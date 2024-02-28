@@ -86,7 +86,7 @@ public class DefaultDriveTrain extends Command {
 
         // We use negative sign here because Y-axis on controllers and joysticks are flipped (Except PS4 Controllers)
         if (m_isTankDrive) {
-            m_driveTrain.useTankDrive(sign * m_leftYValue, sign * m_rightYValue, m_isSquared);
+            m_driveTrain.useTankDrive(-1 * sign * m_leftYValue, -1 * sign * m_rightYValue, m_isSquared);
         } else {
             m_driveTrain.useArcadeDrive(sign * m_forwardValue, sign * m_turnValue, m_isSquared);
         }

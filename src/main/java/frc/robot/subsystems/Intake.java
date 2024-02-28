@@ -25,9 +25,11 @@ public class Intake extends SubsystemBase {
 
     private SparkPIDController m_pid;
 
-    private boolean m_isTuning, m_hasNote, m_updateNow;
+    private boolean m_isTuning, m_hasNote, m_updateNow, m_isFeeding;
 
     private DigitalInput m_noteBeam;
+
+    private double m_feedPower;
 
     // Tuning Param
     private ShuffleboardTab m_tab;
@@ -46,7 +48,6 @@ public class Intake extends SubsystemBase {
         m_motor.setInverted(true);
 
         m_encoder = m_motor.getEncoder();
-        //m_encoder.setInverted(false);
         m_encoder.setPositionConversionFactor(kINTAKE_POS_FACTOR_RAD); // rad
         m_encoder.setVelocityConversionFactor(kINTAKE_VEL_FACTOR_RAD); // rad/sec
 
@@ -59,8 +60,11 @@ public class Intake extends SubsystemBase {
         m_pid.setFF(kINTAKE_GAINS.kFF, kINTAKE_GAINS.kSlotID);
         m_pid.setOutputRange(kINTAKE_GAINS.kMinOutput, kINTAKE_GAINS.kMaxOutput, kINTAKE_GAINS.kSlotID);
 
-        //m_noteBeam = new DigitalInput(kNOTE_BEAM_CHANNEL);
-        //m_hasNote = m_noteBeam.get();
+        m_noteBeam = new DigitalInput(1);
+        m_noteBeam = new DigitalInput(2);
+        m_hasNote = m_noteBeam.get();
+        m_isFeeding = false;
+        m_feedPower = 3500.0; // RPM
 
         /* Tuning */
         m_isTuning = isTuning;
@@ -70,19 +74,22 @@ public class Intake extends SubsystemBase {
 
     @Override
     public void periodic() {
-
-        
-
-
-
-
-        m_pid.setReference(m_setpoint, CANSparkBase.ControlType.kVelocity, kINTAKE_GAINS.kSlotID);
+        if(!m_isFeeding) {
+            m_pid.setReference(m_setpoint, CANSparkBase.ControlType.kVelocity, kINTAKE_GAINS.kSlotID);
+        } else {
+            m_pid.setReference(m_feedPower, CANSparkBase.ControlType.kVelocity, kINTAKE_GAINS.kSlotID);
+        }
+        m_hasNote = m_noteBeam.get();
         /* TUNING */
         if(m_isTuning) {periodicTuning();}
     }
 
+    public boolean hasNote() {
+        return !m_hasNote;
+    }
+
     public void manualIntake(double vel) {
-        //m_motor.set(vel);
+        m_motor.set(vel);
     }
 
     public void setVel(double RPM) {
@@ -107,6 +114,14 @@ public class Intake extends SubsystemBase {
         return m_response;
     }
 
+    public double getPos() {
+        return m_encoder.getPosition();
+    }
+
+    public double getPosIn() {
+        return (getPos() * (1.0/25.0) * (2 * Math.PI));
+    }
+
     public double getVel() {
         return m_encoder.getVelocity();
     }
@@ -121,6 +136,14 @@ public class Intake extends SubsystemBase {
 
     public double getTemp() {
         return m_motor.getMotorTemperature();
+    }
+
+    public boolean isFeeding() {
+        return m_isFeeding;
+    }
+
+    public void toggleFeed() {
+        m_isFeeding = !m_isFeeding;
     }
 
     public void updateGains() {
@@ -156,6 +179,7 @@ public class Intake extends SubsystemBase {
 
     public void tune() {
 
+
         m_tab = Shuffleboard.getTab("Intake Tuner");
 
         m_kP = kINTAKE_GAINS.kP;
@@ -177,6 +201,8 @@ public class Intake extends SubsystemBase {
         m_tab.addNumber("kI", this::getKi).withPosition(1, 1);
         m_tab.addNumber("kD", this::getKd).withPosition(1, 2);
         m_tab.addNumber("kFF", this::getKFF).withPosition(1, 3);
+
+        m_tab.addBoolean("Has Note", this::hasNote).withPosition(6, 0).withSize(1, 1);
 
         e_userSetpoint = m_tab.add("User Setpoint RPM", m_userSetpoint).withPosition(2, 0).withSize(2, 1).getEntry();
         m_tab.addNumber("Setpoint RPM", this::getSetpoint).withPosition(4, 0);

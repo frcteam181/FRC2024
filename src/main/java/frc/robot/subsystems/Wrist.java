@@ -103,18 +103,19 @@ public class Wrist extends SubsystemBase {
     // Trapezoid Methods
 
     public void useState(TrapezoidProfile.State state) {
-        var err = 0.5;
+        var err = 1;
         m_setpoint = (state.position - kZERO_WRIST);
         m_pid.setReference(state.position, CANSparkBase.ControlType.kPosition, kWRIST_GAINS.kSlotID);
         if((m_goal.position > (m_state.position - Math.toRadians(err))) && (m_goal.position < (m_state.position + Math.toRadians(err)))) {m_enabled = false;}
     }
 
     public void setGoal(TrapezoidProfile.State goal) {
-        m_goal = goal;
+        m_enabled = true;
+        m_goal = new TrapezoidProfile.State(clamp(goal.position, kMIN_WRIST_POS_RAD, kMAX_WRIST_POS_RAD) + kZERO_WRIST, goal.velocity);
     }
 
     public void setGoal(double pos) {
-        m_goal = new TrapezoidProfile.State((pos + kZERO_WRIST), 0.0);
+        setGoal(new TrapezoidProfile.State(pos, 0.0));
     }
 
 
@@ -243,6 +244,15 @@ public class Wrist extends SubsystemBase {
         return false;
     }
 
+    public double clamp(double value, double MIN, double MAX) {
+        if(value > MAX) {
+            return MAX;
+        } else if(value < MIN) {
+            return MIN;
+        }
+        return value;
+    }
+
     /* TUNING */
 
     public void tune() {
@@ -313,32 +323,3 @@ public class Wrist extends SubsystemBase {
     }
     
 }
-
-
-/* PRESETS!!!
-
-
- * Intake 
- *      Arm = 0
- *      Wrist = 0
- * 
- * Forward Amp
- *      Arm = 49
- *      Wrist = -0.7
- * 
- * Backward Amp
- *      Arm = 94.5
- *      Wrist = 5.6
- * 
- * Forward Air Speaker
- *      Arm = 49
- *      Wrist = -110
- * 
- * Backward Air Speaker
- *      Arm = 81
- *      Wrist = -76.9
- * 
- * Backward Ground Speaker
- *      Arm = 16.5
- *      Wrist = -2.4
- */

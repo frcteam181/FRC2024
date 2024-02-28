@@ -11,7 +11,7 @@ public class moveArmTo extends Command {
     private double m_goalPos;
 
     public moveArmTo(double goalPos) {
-
+ 
         m_arm = kARM;
         m_goalPos = goalPos;
 

@@ -31,7 +31,7 @@ public class Arm extends SubsystemBase {
     private TrapezoidProfile.State m_start, m_state, m_goal;
     private TrapezoidProfile m_armProfile;
 
-    private boolean m_enabled, m_isTuning, m_updateNow;
+    private boolean m_enabled, m_isTuning, m_updateNow, m_enabledTest;
     private double m_period, m_armFFValue;
 
     private ArmFeedforward m_armFF;
@@ -86,7 +86,7 @@ public class Arm extends SubsystemBase {
         m_state = new TrapezoidProfile.State(kZERO_ARM, 0.0);
         m_goal = new TrapezoidProfile.State(kZERO_ARM, 0.0);
 
-        m_enabled = true;
+        m_enabled  = false;
 
         m_period = 0.02;
 

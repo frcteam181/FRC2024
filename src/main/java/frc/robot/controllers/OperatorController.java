@@ -5,6 +5,7 @@ import static frc.robot.Constants.*;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.commands.arm_actions.moveArmDown;
 import frc.robot.commands.arm_actions.moveArmTo;
 import frc.robot.commands.arm_actions.moveArmUp;
@@ -12,7 +13,16 @@ import frc.robot.commands.defaults.DefaultArm;
 import frc.robot.commands.defaults.DefaultFlyWheel;
 import frc.robot.commands.defaults.DefaultIntake;
 import frc.robot.commands.defaults.DefaultWrist;
+import frc.robot.commands.flywheel_actions.toggleFlywheel;
+import frc.robot.commands.intake_actions.feedFlywheel;
+import frc.robot.commands.intake_actions.teleIntake;
+import frc.robot.commands.presets.back_amp_preset;
+import frc.robot.commands.presets.back_high_speaker_preset;
+import frc.robot.commands.presets.back_low_speaker_preset;
+import frc.robot.commands.presets.front_amp_preset;
+import frc.robot.commands.presets.front_high_speaker;
 import frc.robot.commands.presets.intake_preset;
+import frc.robot.commands.presets.stow_away_preset;
 import frc.robot.commands.wrist_actions.tiltWristDown;
 import frc.robot.commands.wrist_actions.tiltWristUp;
 import frc.robot.subsystems.Arm;
@@ -34,6 +44,7 @@ public class OperatorController {
     // PS4 Controller
     private PS4Controller m_controllerPS4;
     private JoystickButton m_xPS4, m_sPS4, m_cPS4, m_tPS4, m_lbPS4, m_rbPS4, m_optionsPS4, m_sharePS4;
+    private POVButton m_upPS4, m_dwPS4, m_lPS4, m_rPS4;
 
     public OperatorController(boolean isPS4) {
 
@@ -68,23 +79,48 @@ public class OperatorController {
         m_optionsPS4 = new JoystickButton(m_controllerPS4, PS4Controller.Button.kOptions.value);
         m_sharePS4 = new JoystickButton(m_controllerPS4, PS4Controller.Button.kShare.value);
 
+        m_upPS4 = new POVButton(m_controllerPS4, 0);
+        m_rPS4 = new POVButton(m_controllerPS4, 90);
+        m_dwPS4 = new POVButton(m_controllerPS4, 180);
+        m_lPS4 = new POVButton(m_controllerPS4, 270);
+
         bindPS4Buttons();
 
     }
 
     public void bindPS4Buttons() {
         
-        //m_cPS4.onTrue(new moveArmDown());
-        //m_xPS4.onTrue(new moveArmUp());
+        // COMPETITION (DO NOT CHANGE)
+        //m_tPS4.whileTrue(new feedFlywheel());                       // Feed Flywheels
+        //m_rbPS4.and(m_tPS4).whileTrue(new feedFlywheel());                       // Feed Flywheels
+        //m_xPS4.onTrue(new toggleFlywheel());                        // Start Flywheels
+        //m_rbPS4.and(m_xPS4).onTrue(new toggleFlywheel());                        // Start Flywheels
+        //m_xPS4.onTrue(m_flyWheel.setVelCommand(5000)).onFalse(m_flyWheel.setVelCommand(0));
 
-        //m_cPS4.onTrue(m_wrist.setGoalCommand(Math.toRadians(50)));
-        //m_tPS4.onTrue(m_wrist.setGoalCommand(Math.toRadians(0)));
+        m_sPS4.onTrue(new front_amp_preset());                      // Front Amp
+        m_cPS4.onTrue(new back_amp_preset());                       // Back Amp
+
+        m_upPS4.onTrue(new front_high_speaker());                     // Front (HIGH) Speaker (Only have one option for front)
+        m_dwPS4.onTrue(new back_low_speaker_preset());                        // Back Low Speaker
+
+        m_lPS4.onTrue(new intake_preset());              // Intake
+        m_rPS4.onTrue(new stow_away_preset());               // Stow Away
+
+        m_lbPS4.and(m_upPS4).onTrue(new front_high_speaker());           // Front (HIGH) Speaker (Only have one option for front)
+        m_lbPS4.and(m_dwPS4).onTrue(new back_high_speaker_preset());           // Back High Speaker
+
+        m_rbPS4.whileTrue(new teleIntake());
+
+        // TESTING & OTHERS
+        //m_lbPS4.onTrue(m_intake.setVelCommand(30000)).onFalse(m_intake.setVelCommand(0));
+        //m_rbPS4.onTrue(m_flyWheel.setVelCommand(30000)).onFalse(m_flyWheel.setVelCommand(0));
+
         //m_sPS4.onTrue(m_wrist.setGoalCommand(Math.toRadians(-100)));
 
-        m_rbPS4.onTrue(m_arm.setGoalCommand(Math.toRadians(45)));
-        m_lbPS4.onTrue(m_arm.setGoalCommand(Math.toRadians(0)));
+        //m_rbPS4.onTrue(m_arm.setGoalCommand(Math.toRadians(45)));
+        //m_lbPS4.onTrue(m_arm.setGoalCommand(Math.toRadians(0)));
 
-        m_cPS4.onTrue(new intake_preset());
+        //m_cPS4.onTrue(new intake_preset());
 
         //m_sPS4.onTrue(m_arm.setUserGoalCommand());
 
@@ -128,6 +164,10 @@ public class OperatorController {
         m_lb.whileTrue(new tiltWristDown());
         m_rb.whileTrue(new tiltWristUp());
 
+    }
+
+    public void rumble() {
+        m_controllerPS4.setRumble(null, kARM_GEAR_RATIO);
     }
     
 }

@@ -24,7 +24,13 @@ public class FlyWheel extends SubsystemBase {
 
     private RelativeEncoder m_encoder;
 
-    private boolean m_isTuning, m_updateNow;
+    private boolean m_isTuning, m_updateNow, m_isOn;
+
+    public enum FlyWheelStatus {
+        IDLE, SPEEDING_UP, READY, PURGING
+    }
+
+    private FlyWheelStatus m_status;
 
     // Tuning Param
     private ShuffleboardTab m_tab;
@@ -56,6 +62,9 @@ public class FlyWheel extends SubsystemBase {
         m_pid.setIZone(kFLYWHEEL_GAINS.kIzone, kFLYWHEEL_GAINS.kSlotID);
         m_pid.setOutputRange(kFLYWHEEL_GAINS.kMinOutput, kFLYWHEEL_GAINS.kMaxOutput, kFLYWHEEL_GAINS.kSlotID);
 
+        m_status = FlyWheelStatus.IDLE;
+        m_isOn = false;
+
         /* Tuning */
         m_isTuning = isTuning;
         if(m_isTuning){tune();}
@@ -64,18 +73,25 @@ public class FlyWheel extends SubsystemBase {
 
     @Override
     public void periodic() {
+        var err = 100;
 
         m_pid.setReference(m_setpoint, CANSparkBase.ControlType.kVelocity, kFLYWHEEL_GAINS.kSlotID);
+
+        if((m_setpoint > (m_setpoint - Math.toRadians(err))) 
+            && 
+            (m_setpoint < (m_setpoint + Math.toRadians(err)))) 
+        {m_status = FlyWheelStatus.READY;}
 
         /* TUNING */
         if(m_isTuning) {periodicTuning();}
     }
 
-    public void shoot(double speed) {
-        //m_rightMotor.set(speed);
-    }
-
     public void setVel(double RPM) {
+        if(RPM == 0.0 || RPM == 0) {
+            m_status = FlyWheelStatus.IDLE;
+        } else {
+            m_status = FlyWheelStatus.SPEEDING_UP;
+        }
         m_setpoint = RPM;
     }
 
@@ -89,6 +105,37 @@ public class FlyWheel extends SubsystemBase {
 
     public double getSetpoint() {
         return m_setpoint;
+    }
+
+    public int getStatus() {
+        switch (m_status) {
+            case IDLE:
+                return 0;
+            
+            case SPEEDING_UP:
+                return 1;
+
+            case READY:
+                return 2;
+
+            case PURGING:
+                return 3;
+
+            default:
+                return 0;
+        }
+    }
+
+    public void toggleFlywheel() {
+        if(m_isOn) {
+            setVel(0.0);
+        } else {
+            setVel(4000.0);
+        }
+    }
+
+    public void setSpeed(double value) {
+        m_rightMotor.set(value);
     }
 
     public double[] getResponse() {

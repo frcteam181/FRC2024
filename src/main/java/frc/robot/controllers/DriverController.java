@@ -43,7 +43,7 @@ public class DriverController {
 
         m_driveTrain.setDefaultCommand(new DefaultDriveTrain(m_joystickOne, isSquaredInput));
 
-    }
+    }   
 
     private void controllerSetup(boolean isTankDrive, boolean isPS4, boolean isSquaredInput) {
 

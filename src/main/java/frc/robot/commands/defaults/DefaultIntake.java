@@ -18,11 +18,11 @@ public class DefaultIntake extends Command {
 
     private boolean m_isPS4;
 
-    public DefaultIntake(XboxController controllerXbpox, PS4Controller controllerPS4, boolean isPS4) {
+    public DefaultIntake(XboxController controllerXbox, PS4Controller controllerPS4, boolean isPS4) {
 
         m_isPS4 = isPS4;
         
-        m_controllerXbox = controllerXbpox;
+        m_controllerXbox = controllerXbox;
         m_controllerPS4 = controllerPS4;
 
         m_intake = kINTAKE;
