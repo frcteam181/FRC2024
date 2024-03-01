@@ -39,6 +39,7 @@ public class OperatorController {
     // Xbox Controller
     private XboxController m_controllerXbox;
     private JoystickButton m_a, m_y, m_x, m_b, m_lb, m_rb, m_start;
+    private POVButton m_up, m_dw, m_l, m_r;
 
     // PS4 Controller
     private PS4Controller m_controllerPS4;
@@ -58,9 +59,9 @@ public class OperatorController {
             setUpXboxController();
         }
 
-        m_arm.setDefaultCommand(new DefaultArm(m_controllerXbox, m_controllerPS4, isPS4));
+        //m_arm.setDefaultCommand(new DefaultArm(m_controllerXbox, m_controllerPS4, isPS4));
         m_intake.setDefaultCommand(new DefaultIntake(m_controllerXbox, m_controllerPS4, isPS4));
-        m_wrist.setDefaultCommand(new DefaultWrist(m_controllerXbox, m_controllerPS4, isPS4));
+        //m_wrist.setDefaultCommand(new DefaultWrist(m_controllerXbox, m_controllerPS4, isPS4));
         m_flyWheel.setDefaultCommand(new DefaultFlyWheel(m_controllerXbox, m_controllerPS4, isPS4));
 
     }
@@ -151,17 +152,38 @@ public class OperatorController {
         m_rb = new JoystickButton(m_controllerXbox, XboxController.Button.kRightBumper.value);
         m_start = new JoystickButton(m_controllerXbox, XboxController.Button.kStart.value);
 
+        m_up = new POVButton(m_controllerXbox, 0);
+        m_r = new POVButton(m_controllerXbox, 90);
+        m_dw = new POVButton(m_controllerXbox, 180);
+        m_l = new POVButton(m_controllerXbox, 270);
+
         bindXboxButtons();
 
     }
 
     public void bindXboxButtons() {
 
-        m_x.whileTrue(new moveArmDown());
-        m_y.whileTrue(new moveArmUp());
+         // COMPETITION (DO NOT CHANGE)
+        //m_y.whileTrue(new feedFlywheel());                       // Feed Flywheels
+        //m_rbPS4.and(m_tPS4).whileTrue(new feedFlywheel());                       // Feed Flywheels
+        //m_a.onTrue(new toggleFlywheel());                        // Start Flywheels
+        //m_rbPS4.and(m_xPS4).onTrue(new toggleFlywheel());                        // Start Flywheels
+        //m_xPS4.onTrue(new toggleFlywheel());
 
-        m_lb.whileTrue(new tiltWristDown());
-        m_rb.whileTrue(new tiltWristUp());
+        m_x.onTrue(new front_amp_preset());                      // Front Amp
+        m_b.onTrue(new back_amp_preset());                       // Back Amp
+
+        m_up.onTrue(new front_high_speaker());                     // Front (HIGH) Speaker (Only have one option for front)
+        m_dw.onTrue(new back_low_speaker_preset());                        // Back Low Speaker
+
+        m_l.onTrue(new intake_preset());              // Intake
+        m_r.onTrue(new stow_away_preset());               // Stow Away
+
+        m_lb.and(m_up).onTrue(new front_high_speaker());           // Front (HIGH) Speaker (Only have one option for front)
+        m_lb.and(m_dw).onTrue(new back_high_speaker_preset());           // Back High Speaker
+
+        //m_a.whileTrue(new tiltWristDown());
+        //m_y.whileTrue(new tiltWristUp());
 
     }
 

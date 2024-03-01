@@ -34,12 +34,12 @@ public class DefaultIntake extends Command {
     @Override
     public void execute() {
         
-        /*if(m_isPS4) {
+        if(m_isPS4) {
             m_speed = m_controllerPS4.getLeftY();
         } else {
             m_speed = m_controllerXbox.getLeftY();
         }
-        m_intake.manualIntake(deadzone(m_speed, 0.1));*/
+        m_intake.manualIntake(deadzone(m_speed, 0.1));
 
     }
 

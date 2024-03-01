@@ -84,8 +84,10 @@ public class FlyWheel extends SubsystemBase {
     public void setVel(double RPM) {
         if(RPM == 0.0 || RPM == 0) {
             m_status = FlyWheelStatus.IDLE;
+            System.out.println("Flywheel is on IDLE");
         } else {
             m_status = FlyWheelStatus.SPEEDING_UP;
+            System.out.println("Flywheel is on SPEEDING UP");
         }
         m_setpoint = RPM;
     }

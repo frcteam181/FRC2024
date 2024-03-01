@@ -18,15 +18,11 @@ public class RobotContainer {
   private OperatorController m_operatorController;
 
   public RobotContainer() {
-
-    m_driverController = new DriverController(true, false, true, false);
-    m_operatorController = new OperatorController(true);
-
-    configureBindings();
+       
+    m_driverController = new DriverController(false, false, false, false);
+    m_operatorController = new OperatorController(false);
 
   }
-
-  private void configureBindings() {}
 
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");

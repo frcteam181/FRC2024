@@ -34,12 +34,12 @@ public class DefaultFlyWheel extends Command {
     @Override
     public void execute() {
         
-        /*if(m_isPS4) {
+        if(m_isPS4) {
             m_speed = m_controllerPS4.getRightY();
         } else {
             m_speed = m_controllerXbox.getRightY();
         }
-        m_flyWheel.setSpeed(deadzone(m_speed, 0.1));*/
+        m_flyWheel.setSpeed(deadzone(m_speed, 0.15));
 
     }
 

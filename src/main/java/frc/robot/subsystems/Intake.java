@@ -46,8 +46,8 @@ public class Intake extends SubsystemBase {
         m_motor.setInverted(true);
 
         m_encoder = m_motor.getEncoder();
-        m_encoder.setPositionConversionFactor(kINTAKE_POS_FACTOR_RAD); // rad
-        m_encoder.setVelocityConversionFactor(kINTAKE_VEL_FACTOR_RAD); // rad/sec
+        //m_encoder.setPositionConversionFactor(kINTAKE_POS_FACTOR_RAD); // rad
+        //m_encoder.setVelocityConversionFactor(kINTAKE_VEL_FACTOR_RAD); // rad/sec
 
         m_pid = m_motor.getPIDController();
 
@@ -71,9 +71,11 @@ public class Intake extends SubsystemBase {
     @Override
     public void periodic() {
         if(!m_isFeeding) {
-            m_pid.setReference(m_setpoint, CANSparkBase.ControlType.kVelocity, kINTAKE_GAINS.kSlotID);
+            //m_pid.setReference(m_setpoint, CANSparkBase.ControlType.kVelocity, kINTAKE_GAINS.kSlotID);
+            m_motor.set(m_setpoint);
         } else {
-            m_pid.setReference(kINTAKE_FEED_POWER, CANSparkBase.ControlType.kVelocity, kINTAKE_GAINS.kSlotID);
+            m_motor.set(1);
+            //m_pid.setReference(kINTAKE_FEED_POWER, CANSparkBase.ControlType.kVelocity, kINTAKE_GAINS.kSlotID);
         }
         m_hasNote = m_noteBeam.get();
         /* TUNING */

@@ -1,14 +1,11 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.sensors.Pigeon2;
-import com.ctre.phoenix.sensors.PigeonIMU;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
-import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -56,7 +53,9 @@ public class DriveTrain extends SubsystemBase {
         m_rightFollower.restoreFactoryDefaults();
 
         m_leftLeader.setSmartCurrentLimit(kLEFT_DRIVETRAIN_CURRENT_LIMIT);
-        m_rightLeader.setSmartCurrentLimit(kLEFT_DRIVETRAIN_CURRENT_LIMIT);
+        m_leftFollower.setSmartCurrentLimit(kLEFT_DRIVETRAIN_CURRENT_LIMIT);
+        m_rightLeader.setSmartCurrentLimit(kRIGHT_DRIVETRAIN_CURRENT_LIMIT);
+        m_rightFollower.setSmartCurrentLimit(kRIGHT_DRIVETRAIN_CURRENT_LIMIT);
 
         m_leftFollower.follow(m_leftLeader);
         m_rightFollower.follow(m_rightLeader);
@@ -77,8 +76,8 @@ public class DriveTrain extends SubsystemBase {
         m_rightEncoder.setPositionConversionFactor(kDRIVETRAIN_POS_FACTOR_METER); // m
         m_rightEncoder.setVelocityConversionFactor(kDRIVETRAIN_VEL_FACTOR_METER); // m/sec
 
-        m_leftLeader.setOpenLoopRampRate(0.5);
-        m_rightLeader.setOpenLoopRampRate(0.5);
+        m_leftLeader.setOpenLoopRampRate(0.45);
+        m_rightLeader.setOpenLoopRampRate(0.45);
 
         m_leftPID = m_leftLeader.getPIDController();
         m_rightPID = m_rightLeader.getPIDController();
@@ -295,15 +294,29 @@ public class DriveTrain extends SubsystemBase {
         return (m_leftLeader.getAppliedOutput() * m_leftLeader.getBusVoltage());
     }
 
+    public double getLeftVoltage_bus() {
+        return m_leftLeader.getBusVoltage();
+    }
+    public double getLeftVoltage_output() {
+        return m_leftLeader.getAppliedOutput();
+    }
+
     public double getRightVoltage() {
         return (m_rightLeader.getAppliedOutput() * m_rightLeader.getBusVoltage());
+    }
+
+    public double getRightVoltage_bus() {
+        return m_rightLeader.getBusVoltage();
+    }
+    public double getRightVoltage_output() {
+        return m_rightLeader.getAppliedOutput();
     }
 
     public double getLeftCurrent() {
         return m_leftLeader.getOutputCurrent();
     }
 
-    public double getRightCurrent() {
+    public double getRightCurrent() {    
         return m_rightLeader.getOutputCurrent();
     }
 
@@ -314,6 +327,15 @@ public class DriveTrain extends SubsystemBase {
     public double getRightTemp() {
         return m_rightLeader.getMotorTemperature();
     }
+
+    public double getLeftFollowerTemp() {
+        return m_leftFollower.getMotorTemperature();
+    }
+
+    public double getRightFollowerTemp() {
+        return m_rightFollower.getMotorTemperature();
+    }
+
 
     /*public double getRoll() {
         return m_gyro.getRoll();
@@ -368,7 +390,7 @@ public class DriveTrain extends SubsystemBase {
         m_rightVelResponseIn = new double[2];
 
         // ONLY ENABLE ONE AT A TIME (ERROR WILL OCCUR WHEN MULTIPLE ARE TRUE AT THE SAME TIME)
-        m_DRIVE_POS = false;
+        m_DRIVE_POS = true; 
         m_TURN_POS = false;
         m_DRIVE_VEL = false;
         m_TURN_VEL = false;
@@ -413,11 +435,14 @@ public class DriveTrain extends SubsystemBase {
         m_tab.addDoubleArray("R.Response (In)", this::getRightPosResponseIn).withPosition(7,1).withSize(3,3).withWidget(BuiltInWidgets.kGraph);
 
         // Left Telemetry
+        m_tab.addNumber("L.Volts Bus (V)", this::getLeftVoltage_bus).withPosition(2, 4);
+        m_tab.addNumber("L.Volts Out (V)", this::getLeftVoltage_output).withPosition(2, 5);
         m_tab.addNumber("L.Volts (V)", this::getLeftVoltage).withPosition(2, 1);
         m_tab.addNumber("L.Amps (A)", this::getLeftCurrent).withPosition(2, 2);
-        m_tab.addNumber("L.Temp (C)", this::getLeftTemp).withPosition(2, 3);
+        m_tab.addNumber("L.L.Temp (C)", this::getLeftTemp).withPosition(2, 3);
         m_tab.addNumber("L.Pos (in)", this::getLeftPosIn).withPosition(3, 0);
         m_tab.addNumber("L.Vel (in:sec)", this::getLeftVelIn).withPosition(5, 0);
+        m_tab.addNumber("L.F.Temp (C)", this::getLeftFollowerTemp).withPosition(1, 3);
 
         // Mid
         /*m_tab.addNumber("Yaw (deg)", this::getYaw).withPosition(6, 1);
@@ -425,11 +450,15 @@ public class DriveTrain extends SubsystemBase {
         m_tab.addNumber("Roll (deg)", this::getRoll).withPosition(6, 3);*/
 
         // Right Telemetry
+        m_tab.addNumber("R.Volts Bus (V)", this::getRightVoltage_bus).withPosition(10, 4);
+        m_tab.addNumber("R.Volts Out (V)", this::getRightVoltage_output).withPosition(10, 5);
         m_tab.addNumber("R.Volts (V)", this::getRightVoltage).withPosition(10, 1);
         m_tab.addNumber("R.Amps (A)", this::getRightCurrent).withPosition(10, 2);
         m_tab.addNumber("R.Temp (C)", this::getRightTemp).withPosition(10, 3);
         m_tab.addNumber("R.Pos (in)", this::getRightPosIn).withPosition(7, 0);
         m_tab.addNumber("R.Vel (in:sec)", this::getRightVelIn).withPosition(9, 0);
+        m_tab.addNumber("R.F.Temp (C)", this::getRightFollowerTemp).withPosition(11, 3);
+
     }
 
     public void periodic_DRIVE_POS() {

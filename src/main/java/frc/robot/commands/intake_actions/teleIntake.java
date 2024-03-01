@@ -27,7 +27,7 @@ public class teleIntake extends Command {
         m_arm = kARM;
         m_wrist = kWRIST;
 
-        addRequirements(m_intake, m_flywheel);
+        //addRequirements(m_intake, m_flywheel);
 
     }
 

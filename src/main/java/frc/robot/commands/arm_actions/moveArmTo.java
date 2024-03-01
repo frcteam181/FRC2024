@@ -15,7 +15,7 @@ public class moveArmTo extends Command {
         m_arm = kARM;
         m_goalPos = goalPos;
 
-        addRequirements(m_arm);
+        //addRequirements(m_arm);
     }
 
     @Override

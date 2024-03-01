@@ -10,9 +10,7 @@ public class toggleFlywheel extends Command {
     private FlyWheel m_flywheel;
 
     public toggleFlywheel() {
-
         m_flywheel = kFLYWHEEL;
-
     }
 
     @Override

@@ -50,10 +50,10 @@ public class Constants {
     public static final Gains kDT_DRIVE_VEL_GAINS = new Gains(0.0, 0.0, 0.0, 0.0, 0, -1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 2);
     public static final Gains kDT_TURN_VEL_GAINS = new Gains(0.0, 0.0, 0.0, 0.0, 0, -1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 3);
 
-    public static final int kLEFT_DRIVETRAIN_CURRENT_LIMIT = 70;
-    public static final int kRIGHT_DRIVETRAIN_CURRENT_LIMIT = 70;
+    public static final int kLEFT_DRIVETRAIN_CURRENT_LIMIT = 50;
+    public static final int kRIGHT_DRIVETRAIN_CURRENT_LIMIT = 50;
 
-    public static final double kDRIVETRAIN_GEAR_RATIO = (1.0/1.0);
+    public static final double kDRIVETRAIN_GEAR_RATIO = (40.0/58.0);
     public static final double kWHEEL_DIAMETER_METER = (Units.inchesToMeters(4.0));
     public static final double kDRIVETRAIN_POS_FACTOR_METER = (kDRIVETRAIN_GEAR_RATIO * kWHEEL_DIAMETER_METER * Math.PI); // m
     public static final double kDRIVETRAIN_VEL_FACTOR_METER = (kDRIVETRAIN_POS_FACTOR_METER/60.0); // m/sec
@@ -120,8 +120,8 @@ public class Constants {
     public static final double kINTAKE_POS_FACTOR_RAD = 1; // RPM
     public static final double kINTAKE_VEL_FACTOR_RAD = 1; // RPM
 
-    public static final double kINTAKE_POWER = 90000.0;
-    public static final double kINTAKE_FEED_POWER = 3500.0;
+    public static final double kINTAKE_POWER = 1.0; //90000.0
+    public static final double kINTAKE_FEED_POWER = 1.0; //3500.0
 
     //Presets
 
@@ -137,9 +137,9 @@ public class Constants {
 
     /// MUST BE LAST TO LOAD ///
     //// Subsystems ////
-    public static final DriveTrain kDRIVE_TRAIN = new DriveTrain(false);
+    public static final DriveTrain kDRIVE_TRAIN = new DriveTrain(true);
     public static final Arm kARM = new Arm(false);
-    public static final Wrist kWRIST = new Wrist(false);
+    public static final Wrist kWRIST = new Wrist(false); 
     public static final FlyWheel kFLYWHEEL = new FlyWheel(false);
-    public static final Intake kINTAKE = new Intake(true);
+    public static final Intake kINTAKE = new Intake(false);
 }

@@ -33,8 +33,12 @@ public class DefaultArm extends Command {
 
     @Override
     public void execute() {
-        //m_speed = m_controllerPS4.getRightY();
-        //m_arm.moveArm(m_speed);
+        if(m_isPS4) {
+            m_speed = m_controllerPS4.getRightY();
+        } else {
+            m_speed = m_controllerXbox.getRightY();
+        }
+        m_arm.moveArm(m_speed);
     }
     
 }
