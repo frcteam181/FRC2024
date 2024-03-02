@@ -215,6 +215,10 @@ public class DriveTrain extends SubsystemBase {
         m_rightLeader.set(speed);
     }
 
+    public Command setSpeedCommand(double speed) {
+        return Commands.runOnce(() -> setSpeed(speed));
+    }
+
     public void stop() {
         m_leftLeader.set(0.0);
         m_rightLeader.set(0.0);

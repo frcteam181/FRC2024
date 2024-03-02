@@ -13,6 +13,7 @@ import frc.robot.commands.Auto.DoNothing;
 import frc.robot.commands.Auto.PreLoadOnly;
 import frc.robot.commands.Auto.PreLoad_n_Taxi;
 import frc.robot.commands.Auto.TaxiOnly;
+import frc.robot.commands.Auto.TimeTaxiOnly;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Wrist;
@@ -42,6 +43,7 @@ public class Competition {
         m_autoChooser.addOption("Pre-Load Only", new PreLoadOnly());
         m_autoChooser.addOption("Taxi Only", new TaxiOnly());
         m_autoChooser.addOption("Pre-Load & Taxi", new PreLoad_n_Taxi());
+        m_autoChooser.addOption("Timed taxi", new TimeTaxiOnly(0.8, 4.0));
         m_tab.add("Auto", m_autoChooser).withWidget(BuiltInWidgets.kComboBoxChooser).withPosition(3, 0).withSize(2, 1);
 
         m_tab.addBoolean("Has Note", m_intake::hasNote).withPosition(0, 0).withSize(1, 1);
