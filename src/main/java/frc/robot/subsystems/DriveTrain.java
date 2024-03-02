@@ -76,8 +76,8 @@ public class DriveTrain extends SubsystemBase {
         m_rightEncoder.setPositionConversionFactor(kDRIVETRAIN_POS_FACTOR_METER); // m
         m_rightEncoder.setVelocityConversionFactor(kDRIVETRAIN_VEL_FACTOR_METER); // m/sec
 
-        m_leftLeader.setOpenLoopRampRate(0.45);
-        m_rightLeader.setOpenLoopRampRate(0.45);
+        m_leftLeader.setOpenLoopRampRate(0.35);
+        m_rightLeader.setOpenLoopRampRate(0.35);
 
         m_leftPID = m_leftLeader.getPIDController();
         m_rightPID = m_rightLeader.getPIDController();
@@ -207,6 +207,11 @@ public class DriveTrain extends SubsystemBase {
     }
 
     public void setRightSpeed(double speed) {
+        m_rightLeader.set(speed);
+    }
+
+    public void setSpeed(double speed) {
+        m_leftLeader.set(speed);
         m_rightLeader.set(speed);
     }
 

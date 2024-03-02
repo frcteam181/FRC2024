@@ -77,6 +77,9 @@ public class Arm extends SubsystemBase {
         m_leftMotor.setIdleMode(IdleMode.kBrake);
         m_rightMotor.setIdleMode(IdleMode.kBrake);
 
+        m_rightMotor.burnFlash();
+        m_leftMotor.burnFlash();
+
         /* Trapezoid Profile */
 
         m_constraints = new TrapezoidProfile.Constraints(kARM_GAINS.kMaxVel, kARM_GAINS.kMaxAcc); // rad/s & rad/s^2
@@ -122,6 +125,7 @@ public class Arm extends SubsystemBase {
     }
 
     public void setGoal(TrapezoidProfile.State goal) {
+        m_state = new TrapezoidProfile.State(getPos() + kZERO_ARM, 0);
         m_enabled = true;
         m_goal = new TrapezoidProfile.State(clamp(goal.position, kMIN_ARM_POS_RAD, kMAX_ARM_POS_RAD) + kZERO_ARM, goal.velocity);
     }

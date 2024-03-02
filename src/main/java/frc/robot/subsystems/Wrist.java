@@ -110,6 +110,7 @@ public class Wrist extends SubsystemBase {
     }
 
     public void setGoal(TrapezoidProfile.State goal) {
+        m_state = new TrapezoidProfile.State(getPos() + kZERO_WRIST, 0);
         m_enabled = true;
         m_goal = new TrapezoidProfile.State(clamp(goal.position, kMIN_WRIST_POS_RAD, kMAX_WRIST_POS_RAD) + kZERO_WRIST, goal.velocity);
     }

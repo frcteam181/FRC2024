@@ -42,9 +42,9 @@ public class Competition {
         m_autoChooser.addOption("Pre-Load Only", new PreLoadOnly());
         m_autoChooser.addOption("Taxi Only", new TaxiOnly());
         m_autoChooser.addOption("Pre-Load & Taxi", new PreLoad_n_Taxi());
-        m_tab.add("Auto", m_autoChooser).withWidget(BuiltInWidgets.kComboBoxChooser).withPosition(1, 1).withSize(2, 1);
+        m_tab.add("Auto", m_autoChooser).withWidget(BuiltInWidgets.kComboBoxChooser).withPosition(3, 0).withSize(2, 1);
 
-        m_tab.addBoolean("Has Note", m_intake::hasNote).withPosition(0, 0);
+        m_tab.addBoolean("Has Note", m_intake::hasNote).withPosition(0, 0).withSize(1, 1);
         m_tab.addNumber("Arm Pos", m_arm::getPosDeg).withPosition(1,0);
         m_tab.addNumber("Wrist Pos", m_wrist::getPosDeg).withPosition(2, 0);
 

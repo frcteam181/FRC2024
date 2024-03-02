@@ -58,7 +58,7 @@ public class Intake extends SubsystemBase {
         m_pid.setFF(kINTAKE_GAINS.kFF, kINTAKE_GAINS.kSlotID);
         m_pid.setOutputRange(kINTAKE_GAINS.kMinOutput, kINTAKE_GAINS.kMaxOutput, kINTAKE_GAINS.kSlotID);
 
-        m_noteBeam = new DigitalInput(1);
+        m_noteBeam = new DigitalInput(9);
         m_hasNote = m_noteBeam.get();
         m_isFeeding = false;
 

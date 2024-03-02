@@ -125,7 +125,7 @@ public class Constants {
 
     //Presets
 
-    public static final PresetValues kINTAKE_PRESET = new PresetValues(0.0, 0.0, true);
+    public static final PresetValues kINTAKE_PRESET = new PresetValues(-5.0, 0.0, true);
     public static final PresetValues kSTOW_AWAY_PRESET = new PresetValues(-2.4, 16.5, true);
     
     public static final PresetValues kBACK_AMP_PRESET = new PresetValues(5.6, 94.5, true);

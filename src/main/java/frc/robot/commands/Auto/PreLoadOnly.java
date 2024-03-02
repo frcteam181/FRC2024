@@ -35,7 +35,7 @@ public class PreLoadOnly extends Command {
 
         m_arm.setGoal(kBACK_HIGH_SPEAKER_PRESET.kArmPos);
         m_wrist.setGoal(kBACK_HIGH_SPEAKER_PRESET.kWristPos);
-        m_flywheel.setSpeed(50000.0);
+        m_flywheel.setSpeed(1.0);
     }
 
     @Override
@@ -43,7 +43,7 @@ public class PreLoadOnly extends Command {
 
         if(!m_arm.isEnabled() && !m_wrist.isEnabled()) {
             System.out.println("Pre Load Only In Position");
-            m_intake.setVel(5000.0);
+            m_intake.setVel(1.0);
         }
     }
 
