@@ -202,6 +202,24 @@ public class DriveTrain extends SubsystemBase {
 
     }
 
+    public void setLeftSpeed(double speed) {
+        m_leftLeader.set(speed);
+    }
+
+    public void setRightSpeed(double speed) {
+        m_rightLeader.set(speed);
+    }
+
+    public void stop() {
+        m_leftLeader.set(0.0);
+        m_rightLeader.set(0.0);
+    }
+
+    public void resetEncoders() {
+        m_leftEncoder.setPosition(0.0);
+        m_rightEncoder.setPosition(0.0);
+    }
+
     public double getLeftPosSetpoint() {
         return m_leftPosSetpoint;
     }

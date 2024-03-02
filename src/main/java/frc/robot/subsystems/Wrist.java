@@ -75,8 +75,8 @@ public class Wrist extends SubsystemBase {
 
         m_wristProfile = new TrapezoidProfile(m_constraints);
 
-        m_state = new TrapezoidProfile.State(kZERO_WRIST, 0.0);
-        m_goal = new TrapezoidProfile.State(kZERO_WRIST, 0.0);
+        m_state = new TrapezoidProfile.State(getPos() + kZERO_WRIST, 0.0);
+        m_goal = new TrapezoidProfile.State(getPos() + kZERO_WRIST, 0.0);
 
         m_enabled = false;
 
@@ -125,6 +125,11 @@ public class Wrist extends SubsystemBase {
 
     public Command setGoalCommand(double pos) {
         return Commands.runOnce(() -> setGoal(pos), this);
+    }
+
+    public void resetStartPos() {
+        m_start = new TrapezoidProfile.State(getPos() + kZERO_WRIST, 0);
+        m_state = m_start;
     }
 
     // Class Methods
@@ -263,8 +268,8 @@ public class Wrist extends SubsystemBase {
         m_kI = kWRIST_GAINS.kI;
         m_kD = kWRIST_GAINS.kD;
 
-        m_setpoint = 0;
-        m_setpointDeg = 0;
+        m_setpoint = getPos();
+        m_setpointDeg = getPosDeg();
 
         m_responseDeg = new double[2];
 

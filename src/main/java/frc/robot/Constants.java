@@ -137,9 +137,9 @@ public class Constants {
 
     /// MUST BE LAST TO LOAD ///
     //// Subsystems ////
-    public static final DriveTrain kDRIVE_TRAIN = new DriveTrain(true);
-    public static final Arm kARM = new Arm(false);
-    public static final Wrist kWRIST = new Wrist(false); 
+    public static final DriveTrain kDRIVE_TRAIN = new DriveTrain(false);
+    public static final Arm kARM = new Arm(true);
+    public static final Wrist kWRIST = new Wrist(true); 
     public static final FlyWheel kFLYWHEEL = new FlyWheel(false);
     public static final Intake kINTAKE = new Intake(false);
 }

@@ -83,8 +83,8 @@ public class Arm extends SubsystemBase {
 
         m_armProfile = new TrapezoidProfile(m_constraints);
 
-        m_state = new TrapezoidProfile.State(kZERO_ARM, 0.0);
-        m_goal = new TrapezoidProfile.State(kZERO_ARM, 0.0);
+        m_state = new TrapezoidProfile.State(getPos() + kZERO_ARM, 0.0);
+        m_goal = new TrapezoidProfile.State(getPos() + kZERO_ARM, 0.0);
 
         m_enabled  = false;
 
@@ -140,6 +140,11 @@ public class Arm extends SubsystemBase {
 
     public Command setUserGoalCommand() {
         return Commands.runOnce(() -> setGoal(m_userGoal), this);
+    }
+
+    public void resetStartPos() {
+        m_start = new TrapezoidProfile.State(getPos() + kZERO_ARM, 0);
+        m_state = m_start;
     }
 
     // Class Methods
@@ -294,8 +299,8 @@ public class Arm extends SubsystemBase {
 
         m_userGoalDeg = 0;
 
-        m_posSetpoint = 0;
-        m_posSetpointDeg = 0;
+        m_posSetpoint = getPos();
+        m_posSetpointDeg = getPosDeg();
 
         m_velSetpoint = 0;
 
