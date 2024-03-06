@@ -27,7 +27,7 @@ public class Wrist extends SubsystemBase {
     private TrapezoidProfile.State m_start, m_state, m_goal;
     private TrapezoidProfile m_wristProfile;
 
-    private boolean m_enabled, m_isTuning, m_updateNow;
+    private boolean m_enabled, m_isTuning, m_updateNow, m_isWristSafe;
 
     private double m_period;
 
@@ -79,6 +79,7 @@ public class Wrist extends SubsystemBase {
         m_goal = new TrapezoidProfile.State(getPos() + kZERO_WRIST, 0.0);
 
         m_enabled = false;
+        m_isWristSafe = false;
 
         m_period = 0.02;
 
@@ -93,6 +94,8 @@ public class Wrist extends SubsystemBase {
 
         m_state = m_wristProfile.calculate(m_period, m_state, m_goal);
 
+        if(getPos() >= kSAFE_WRIST_POS_RAD) {m_isWristSafe = true;} else {m_isWristSafe = false;}
+
         if (m_enabled) {useState(m_state);}
 
         /* TUNING */
@@ -103,7 +106,7 @@ public class Wrist extends SubsystemBase {
     // Trapezoid Methods
 
     public void useState(TrapezoidProfile.State state) {
-        var err = 1;
+        var err = 2.0;
         m_setpoint = (state.position - kZERO_WRIST);
         m_pid.setReference(state.position, CANSparkBase.ControlType.kPosition, kWRIST_GAINS.kSlotID);
         if((m_goal.position > (m_state.position - Math.toRadians(err))) && (m_goal.position < (m_state.position + Math.toRadians(err)))) {m_enabled = false;}

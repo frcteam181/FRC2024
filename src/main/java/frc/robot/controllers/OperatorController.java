@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
+import frc.robot.commands.a_presets.a_back_high_speaker;
 import frc.robot.commands.arm_actions.moveArmDown;
 import frc.robot.commands.arm_actions.moveArmUp;
 import frc.robot.commands.defaults.DefaultArm;
@@ -180,7 +181,12 @@ public class OperatorController {
         m_r.onTrue(new stow_away_preset());               // Stow Away
 
         m_lb.and(m_up).onTrue(new front_high_speaker());           // Front (HIGH) Speaker (Only have one option for front)
-        m_lb.and(m_dw).onTrue(new back_high_speaker_preset());           // Back High Speaker
+        //m_lb.and(m_dw).onTrue(new back_high_speaker_preset());           // Back High Speaker
+        m_lb.and(m_dw).onTrue(new a_back_high_speaker());
+
+        //m_rb.whileTrue(new teleIntake());
+        //m_a.onTrue(new toggleFlywheel());
+        //m_y.whileTrue(new feedFlywheel());
 
         //m_x.onTrue(m_arm.updateNowCommand());
 

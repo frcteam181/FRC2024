@@ -17,6 +17,8 @@ public class PreLoadOnly extends Command {
     private Intake m_intake;
     private Timer m_timer;
 
+    private boolean m_setWrist;
+
     public PreLoadOnly() {
 
         m_arm = kARM;
@@ -25,6 +27,8 @@ public class PreLoadOnly extends Command {
         m_intake = kINTAKE;
         m_timer = new Timer();
 
+        m_setWrist = false;
+
         addRequirements(m_flywheel, m_intake);
 
     }
@@ -32,14 +36,8 @@ public class PreLoadOnly extends Command {
     @Override
     public void initialize() {
         System.out.println("Pre Load Only Started");
-        
-        m_arm.resetStartPos();
-        m_wrist.resetStartPos();
-        m_arm.resetStartPos();
-        m_wrist.resetStartPos();
 
         m_arm.setGoal(kBACK_HIGH_SPEAKER_PRESET.kArmPos);
-        m_wrist.setGoal(kBACK_HIGH_SPEAKER_PRESET.kWristPos);
 
         m_timer.reset();
         m_timer.start();
@@ -51,7 +49,9 @@ public class PreLoadOnly extends Command {
     @Override
     public void execute() {
 
-        if(!m_arm.isEnabled() && !m_wrist.isEnabled() && m_timer.hasElapsed(5.0)) {
+         if(m_arm.isArmSafe() && !m_setWrist) {m_wrist.setGoal(kBACK_HIGH_SPEAKER_PRESET.kWristPos); m_setWrist = true;}
+
+        if(!m_arm.isEnabled() && !m_wrist.isEnabled() && m_timer.hasElapsed(1.8)) {
             System.out.println("Pre Load Only In Position");
             m_intake.setVel(1.0);
         }
@@ -70,6 +70,8 @@ public class PreLoadOnly extends Command {
     @Override
     public void end(boolean interrupted) {
         System.out.println("Pre Load Only Ended");
+        m_wrist.setGoal(kSTOW_AWAY_PRESET.kWristPos);
+        m_arm.setGoal(kSTOW_AWAY_PRESET.kArmPos);
         m_intake.setVel(0.0);
         m_flywheel.setSpeed(0.0);
         m_timer.stop();

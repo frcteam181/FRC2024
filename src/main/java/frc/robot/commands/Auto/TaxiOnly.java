@@ -44,11 +44,6 @@ public class TaxiOnly extends Command {
     @Override
     public void initialize() {
 
-        m_arm.resetStartPos();
-        m_wrist.resetStartPos();
-        m_arm.resetStartPos();
-        m_wrist.resetStartPos();
-
         m_arm.setGoal(kSTOW_AWAY_PRESET.kArmPos);
         m_wrist.setGoal(kSTOW_AWAY_PRESET.kWristPos);
 

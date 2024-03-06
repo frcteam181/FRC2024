@@ -31,7 +31,7 @@ public class Arm extends SubsystemBase {
     private TrapezoidProfile.State m_start, m_state, m_goal;
     private TrapezoidProfile m_armProfile;
 
-    private boolean m_enabled, m_isTuning, m_updateNow;
+    private boolean m_enabled, m_isTuning, m_updateNow, m_isArmSafe, m_isArmSuperSafe;
     private double m_period, m_armFFValue;
 
     private ArmFeedforward m_armFF;
@@ -96,6 +96,9 @@ public class Arm extends SubsystemBase {
 
         m_enabled  = false;
 
+        m_isArmSafe = false;
+        m_isArmSuperSafe = false;
+
         m_period = 0.02;
 
         /* Tuning */
@@ -113,6 +116,9 @@ public class Arm extends SubsystemBase {
             useState(m_state);
         }
 
+        if(getPos() >= kSAFE_ARM_POS_RAD) {m_isArmSafe = true;} else {m_isArmSafe = false;}
+        if(getPos() >= kSUPER_SAFE_ARM_POS_RAD) {m_isArmSuperSafe = true;} else {m_isArmSuperSafe = false;}
+
         /* TUNING */
         if(m_isTuning) {periodicTuning();}
     
@@ -126,7 +132,7 @@ public class Arm extends SubsystemBase {
         m_velSetpoint = (state.velocity);
         m_armFFValue = m_armFF.calculate(m_posSetpoint, state.velocity);
         m_pid.setReference(state.position, CANSparkBase.ControlType.kPosition, kARM_GAINS.kSlotID, m_armFFValue);
-        if((m_goal.position > (m_state.position - Math.toRadians(err))) && (m_goal.position < (m_state.position + Math.toRadians(err)))) {m_enabled = false;}
+        if((getPos() > (m_goal.position - Math.toRadians(err))) && (getPos() < (m_goal.position + Math.toRadians(err)))) {m_enabled = false;}
     }
 
     public void setGoal(TrapezoidProfile.State goal) {
@@ -157,6 +163,14 @@ public class Arm extends SubsystemBase {
     }
 
     // Class Methods
+
+    public boolean isArmSafe() {
+        return m_isArmSafe;
+    }
+
+    public boolean isArmSuperSafe() {
+        return m_isArmSuperSafe;
+    }
 
     public void moveArm(double speed) {
         m_rightMotor.set(speed);

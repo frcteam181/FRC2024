@@ -14,6 +14,8 @@ public class TimeTaxiOnly extends SequentialCommandGroup {
 
         m_driveTrain = kDRIVE_TRAIN;
 
+        addRequirements(m_driveTrain);
+
         addCommands(
             m_driveTrain.setSpeedCommand(speed),
             new WaitCommand(sec),
