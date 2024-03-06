@@ -73,7 +73,7 @@ public class FlyWheel extends SubsystemBase {
 
     @Override
     public void periodic() {
-        m_pid.setReference(m_setpoint, CANSparkBase.ControlType.kVelocity, kFLYWHEEL_GAINS.kSlotID);
+        //m_pid.setReference(m_setpoint, CANSparkBase.ControlType.kVelocity, kFLYWHEEL_GAINS.kSlotID);
 
         m_status = FlyWheelStatus.READY;
 

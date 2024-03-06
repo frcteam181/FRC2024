@@ -53,7 +53,7 @@ public class Constants {
     public static final int kLEFT_DRIVETRAIN_CURRENT_LIMIT = 50;
     public static final int kRIGHT_DRIVETRAIN_CURRENT_LIMIT = 50;
 
-    public static final double kDRIVETRAIN_GEAR_RATIO = (40.0/58.0);
+    public static final double kDRIVETRAIN_GEAR_RATIO = (0.13585);
     public static final double kWHEEL_DIAMETER_METER = (Units.inchesToMeters(4.0));
     public static final double kDRIVETRAIN_POS_FACTOR_METER = (kDRIVETRAIN_GEAR_RATIO * kWHEEL_DIAMETER_METER * Math.PI); // m
     public static final double kDRIVETRAIN_VEL_FACTOR_METER = (kDRIVETRAIN_POS_FACTOR_METER/60.0); // m/sec
@@ -67,6 +67,7 @@ public class Constants {
 
     // Arm (rad)
     public static final Gains kARM_GAINS = new Gains(2.0, 0.0, 0.1, 0.0, 0, -1.0, 1.0, 0.0, Math.toRadians(120.0), Math.toRadians(50.0), 0.0, 0);
+    //public static final Gains kARM_GAINS = new Gains(0.0, 0.0, 0.0, 0.0, 0, -1.0, 1.0, 0.0, Math.toRadians(120.0), Math.toRadians(50.0), 0.0, 0);
 
     public static final int kLEFT_ARM_CURRENT_LIMIT = 70;
     public static final int kRIGHT_ARM_CURRENT_LIMIT = 70;
@@ -75,8 +76,8 @@ public class Constants {
     public static final double kARM_POS_FACTOR_RAD = Math.toRadians(kARM_GEAR_RATIO * 360.0); // rad
     public static final double kARM_VEL_FACTOR_RAD = (kARM_POS_FACTOR_RAD/60.0); // rad/sec
 
-    public static final double kARM_ZERO_OFFSET = Math.toRadians(0.0); // rad
-    public static final double kZERO_ARM = Math.toRadians(28.72); // On bumper reading = 0
+    public static final double kARM_ZERO_OFFSET = 5.83; // rad
+    public static final double kZERO_ARM = 0;//Math.toRadians(28.72); // On bumper reading = 0
 
     public static final double kMAX_ARM_POS_RAD = Math.toRadians(100.0); // rad
     public static final double kMIN_ARM_POS_RAD = Math.toRadians(0.0); // rad
@@ -87,6 +88,7 @@ public class Constants {
 
     // Wrist (rad)
     public static final Gains kWRIST_GAINS = new Gains(0.55, 0.0, 0.0, 0.0, 0, -1.0, 1.0, 0.0, Math.toRadians(900), Math.toRadians(500), 0.0, 0); //rad
+
 
     public static final int kLEFT_WRIST_CURRENT_LIMIT = 40;
     public static final int kRIGHT_WRIST_CURRENT_LIMIT = 40;
@@ -139,7 +141,7 @@ public class Constants {
     //// Subsystems ////
     public static final DriveTrain kDRIVE_TRAIN = new DriveTrain(false);
     public static final Arm kARM = new Arm(true);
-    public static final Wrist kWRIST = new Wrist(true); 
+    public static final Wrist kWRIST = new Wrist(false); 
     public static final FlyWheel kFLYWHEEL = new FlyWheel(false);
     public static final Intake kINTAKE = new Intake(false);
 }

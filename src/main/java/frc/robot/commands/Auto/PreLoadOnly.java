@@ -2,6 +2,7 @@ package frc.robot.commands.Auto;
 
 import static frc.robot.Constants.*;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.FlyWheel;
@@ -14,6 +15,7 @@ public class PreLoadOnly extends Command {
     private Wrist m_wrist;
     private FlyWheel m_flywheel;
     private Intake m_intake;
+    private Timer m_timer;
 
     public PreLoadOnly() {
 
@@ -21,6 +23,9 @@ public class PreLoadOnly extends Command {
         m_wrist = kWRIST;
         m_flywheel = kFLYWHEEL;
         m_intake = kINTAKE;
+        m_timer = new Timer();
+
+        addRequirements(m_flywheel, m_intake);
 
     }
 
@@ -35,13 +40,18 @@ public class PreLoadOnly extends Command {
 
         m_arm.setGoal(kBACK_HIGH_SPEAKER_PRESET.kArmPos);
         m_wrist.setGoal(kBACK_HIGH_SPEAKER_PRESET.kWristPos);
+
+        m_timer.reset();
+        m_timer.start();
+
         m_flywheel.setSpeed(1.0);
+
     }
 
     @Override
     public void execute() {
 
-        if(!m_arm.isEnabled() && !m_wrist.isEnabled()) {
+        if(!m_arm.isEnabled() && !m_wrist.isEnabled() && m_timer.hasElapsed(5.0)) {
             System.out.println("Pre Load Only In Position");
             m_intake.setVel(1.0);
         }
@@ -62,6 +72,7 @@ public class PreLoadOnly extends Command {
         System.out.println("Pre Load Only Ended");
         m_intake.setVel(0.0);
         m_flywheel.setSpeed(0.0);
+        m_timer.stop();
     }
     
 }

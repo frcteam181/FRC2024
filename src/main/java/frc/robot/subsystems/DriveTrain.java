@@ -159,8 +159,13 @@ public class DriveTrain extends SubsystemBase {
 
     @Override
     public void periodic() {
+        feedOutput();
         /* TUNING */
         if(m_isTuning) {periodicTuning();}
+    }
+
+    public void feedOutput() {
+        m_diffDrive.feedWatchdog();
     }
 
     // To default the values to use direct joystick values, change n = 1; and kDRIVE_DEADZONE to 0;

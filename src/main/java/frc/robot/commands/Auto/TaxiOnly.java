@@ -23,13 +23,21 @@ public class TaxiOnly extends Command {
     private Intake m_intake;
     private FlyWheel m_flywheel;
 
-    public TaxiOnly() {
+    private double m_distanceIn;
+
+    public TaxiOnly(double distanceIn) {
 
         m_driveTrain = kDRIVE_TRAIN;
         m_arm = kARM;
         m_wrist = kWRIST;
         m_intake = kINTAKE;
         m_flywheel = kFLYWHEEL;
+
+        m_distanceIn = distanceIn;
+
+        addRequirements(m_driveTrain);
+
+        m_driveTrain.resetEncoders();
 
     }
 
@@ -43,13 +51,15 @@ public class TaxiOnly extends Command {
 
         m_arm.setGoal(kSTOW_AWAY_PRESET.kArmPos);
         m_wrist.setGoal(kSTOW_AWAY_PRESET.kWristPos);
+
         m_driveTrain.setLeftSpeed(0.25);
         m_driveTrain.setRightSpeed(0.25);
+
     }
 
     @Override
     public boolean isFinished() {
-        if (m_driveTrain.getLeftPos() >= Units.inchesToMeters(48.0) && m_driveTrain.getRightPos() >= Units.inchesToMeters(48.0)) {
+        if (m_driveTrain.getLeftPos() >= Units.inchesToMeters(m_distanceIn) && m_driveTrain.getRightPos() >= Units.inchesToMeters(m_distanceIn)) {
             System.out.println("Taxied");
             m_driveTrain.stop();
             return true;

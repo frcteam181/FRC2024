@@ -53,7 +53,7 @@ public class Arm extends SubsystemBase {
         m_encoder = m_rightMotor.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle);
         m_encoder.setPositionConversionFactor(kARM_POS_FACTOR_RAD); // rad
         m_encoder.setVelocityConversionFactor(kARM_VEL_FACTOR_RAD); // rad/sec
-        m_encoder.setInverted(false);
+        m_encoder.setInverted(true);
         m_encoder.setZeroOffset(kARM_ZERO_OFFSET);
 
         m_pid = m_rightMotor.getPIDController();
@@ -72,10 +72,15 @@ public class Arm extends SubsystemBase {
         m_leftMotor.setSmartCurrentLimit(kLEFT_ARM_CURRENT_LIMIT);
         m_rightMotor.setSmartCurrentLimit(kRIGHT_ARM_CURRENT_LIMIT);
 
+        m_rightMotor.setInverted(true);
+
         m_leftMotor.follow(m_rightMotor, true);
 
         m_leftMotor.setIdleMode(IdleMode.kBrake);
         m_rightMotor.setIdleMode(IdleMode.kBrake);
+
+        //m_leftMotor.setIdleMode(IdleMode.kCoast);
+        //m_rightMotor.setIdleMode(IdleMode.kCoast);
 
         m_rightMotor.burnFlash();
         m_leftMotor.burnFlash();
@@ -116,7 +121,7 @@ public class Arm extends SubsystemBase {
     // Trapezoid Methods
 
     public void useState(TrapezoidProfile.State state) {
-        var err = 0.5;
+        var err = 2.0;
         m_posSetpoint = (state.position - kZERO_ARM); // Corrected to account for abs encoder not being at exactly zero
         m_velSetpoint = (state.velocity);
         m_armFFValue = m_armFF.calculate(m_posSetpoint, state.velocity);

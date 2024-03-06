@@ -182,6 +182,8 @@ public class OperatorController {
         m_lb.and(m_up).onTrue(new front_high_speaker());           // Front (HIGH) Speaker (Only have one option for front)
         m_lb.and(m_dw).onTrue(new back_high_speaker_preset());           // Back High Speaker
 
+        //m_x.onTrue(m_arm.updateNowCommand());
+
         //m_a.whileTrue(new tiltWristDown());
         //m_y.whileTrue(new tiltWristUp());
 
