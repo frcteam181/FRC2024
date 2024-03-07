@@ -112,12 +112,10 @@ public class Arm extends SubsystemBase {
 
         m_state = m_armProfile.calculate(m_period, m_state, m_goal);
 
-        if (m_enabled) {
-            useState(m_state);
-        }
-
         if(getPos() >= kSAFE_ARM_POS_RAD) {m_isArmSafe = true;} else {m_isArmSafe = false;}
         if(getPos() >= kSUPER_SAFE_ARM_POS_RAD) {m_isArmSuperSafe = true;} else {m_isArmSuperSafe = false;}
+
+        if (m_enabled) {useState(m_state);}
 
         /* TUNING */
         if(m_isTuning) {periodicTuning();}
@@ -132,7 +130,7 @@ public class Arm extends SubsystemBase {
         m_velSetpoint = (state.velocity);
         m_armFFValue = m_armFF.calculate(m_posSetpoint, state.velocity);
         m_pid.setReference(state.position, CANSparkBase.ControlType.kPosition, kARM_GAINS.kSlotID, m_armFFValue);
-        if((getPos() > (m_goal.position - Math.toRadians(err))) && (getPos() < (m_goal.position + Math.toRadians(err)))) {m_enabled = false;}
+        if(((getPos() + kZERO_ARM) >= (m_goal.position - Math.toRadians(err))) && ((getPos() + kZERO_ARM) <= (m_goal.position + Math.toRadians(err)))) {m_enabled = false;}
     }
 
     public void setGoal(TrapezoidProfile.State goal) {

@@ -8,6 +8,7 @@ import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -94,7 +95,7 @@ public class Wrist extends SubsystemBase {
 
         m_state = m_wristProfile.calculate(m_period, m_state, m_goal);
 
-        if(getPos() >= kSAFE_WRIST_POS_RAD) {m_isWristSafe = true;} else {m_isWristSafe = false;}
+        if(Math.abs(getPos()) >= Units.degreesToRadians(2.5)) {m_isWristSafe = true;} else {m_isWristSafe = false;}
 
         if (m_enabled) {useState(m_state);}
 
@@ -109,7 +110,7 @@ public class Wrist extends SubsystemBase {
         var err = 2.0;
         m_setpoint = (state.position - kZERO_WRIST);
         m_pid.setReference(state.position, CANSparkBase.ControlType.kPosition, kWRIST_GAINS.kSlotID);
-        if((m_goal.position > (m_state.position - Math.toRadians(err))) && (m_goal.position < (m_state.position + Math.toRadians(err)))) {m_enabled = false;}
+        if(((getPos() + kZERO_WRIST) >= (m_goal.position - Math.toRadians(err))) && ((getPos() + kZERO_WRIST) <= (m_goal.position + Math.toRadians(err)))) {m_enabled = false;}
     }
 
     public void setGoal(TrapezoidProfile.State goal) {
@@ -152,6 +153,10 @@ public class Wrist extends SubsystemBase {
 
     public void stopWrist() {
         m_rightWrist.set(0.0);
+    }
+
+    public boolean isWristSafe() {
+        return m_isWristSafe;
     }
 
     public double getSetpoint() {

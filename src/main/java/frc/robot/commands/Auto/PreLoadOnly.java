@@ -49,7 +49,7 @@ public class PreLoadOnly extends Command {
     @Override
     public void execute() {
 
-         if(m_arm.isArmSafe() && !m_setWrist) {m_wrist.setGoal(kBACK_HIGH_SPEAKER_PRESET.kWristPos); m_setWrist = true;}
+        if(m_arm.isArmSafe() && !m_setWrist) {m_wrist.setGoal(kBACK_HIGH_SPEAKER_PRESET.kWristPos); m_setWrist = true;}
 
         if(!m_arm.isEnabled() && !m_wrist.isEnabled() && m_timer.hasElapsed(1.8)) {
             System.out.println("Pre Load Only In Position");
@@ -70,11 +70,13 @@ public class PreLoadOnly extends Command {
     @Override
     public void end(boolean interrupted) {
         System.out.println("Pre Load Only Ended");
-        m_wrist.setGoal(kSTOW_AWAY_PRESET.kWristPos);
-        m_arm.setGoal(kSTOW_AWAY_PRESET.kArmPos);
         m_intake.setVel(0.0);
         m_flywheel.setSpeed(0.0);
         m_timer.stop();
+        if(!m_intake.hasNote()) {
+        m_wrist.setGoal(kSTOW_AWAY_PRESET.kWristPos);
+        m_arm.setGoal(kSTOW_AWAY_PRESET.kArmPos);
+        }
     }
     
 }

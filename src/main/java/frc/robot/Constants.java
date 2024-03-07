@@ -88,7 +88,7 @@ public class Constants {
     public static final double kARM_KV = 0.5;
 
     // Wrist (rad)
-    public static final Gains kWRIST_GAINS = new Gains(0.55, 0.0, 0.0, 0.0, 0, -1.0, 1.0, 0.0, Math.toRadians(900), Math.toRadians(500), 0.0, 0); //rad
+    public static final Gains kWRIST_GAINS = new Gains(0.6, 0.0, 0.0, 0.0, 0, -1.0, 1.0, 0.0, Math.toRadians(900), Math.toRadians(500), 0.0, 0); //rad
 
 
     public static final int kLEFT_WRIST_CURRENT_LIMIT = 65;

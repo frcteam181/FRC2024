@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
-import frc.robot.commands.a_presets.a_back_high_speaker;
 import frc.robot.commands.arm_actions.moveArmDown;
 import frc.robot.commands.arm_actions.moveArmUp;
 import frc.robot.commands.defaults.DefaultArm;
@@ -16,6 +15,7 @@ import frc.robot.commands.defaults.DefaultWrist;
 import frc.robot.commands.flywheel_actions.toggleFlywheel;
 import frc.robot.commands.intake_actions.feedFlywheel;
 import frc.robot.commands.intake_actions.teleIntake;
+import frc.robot.commands.a_presets.*;
 import frc.robot.commands.presets.back_amp_preset;
 import frc.robot.commands.presets.back_high_speaker_preset;
 import frc.robot.commands.presets.back_low_speaker_preset;
@@ -171,18 +171,18 @@ public class OperatorController {
         //m_rbPS4.and(m_xPS4).onTrue(new toggleFlywheel());                        // Start Flywheels
         //m_xPS4.onTrue(new toggleFlywheel());
 
-        m_x.onTrue(new front_amp_preset());                      // Front Amp
-        m_b.onTrue(new back_amp_preset());                       // Back Amp
+        m_x.onTrue(new a_front_amp_preset());                      // Front Amp
+        m_b.onTrue(new a_back_amp_preset());                       // Back Amp
 
-        m_up.onTrue(new front_high_speaker());                     // Front (HIGH) Speaker (Only have one option for front)
-        m_dw.onTrue(new back_low_speaker_preset());                        // Back Low Speaker
+        m_up.onTrue(new a_front_high_speaker());                     // Front (HIGH) Speaker (Only have one option for front)
+        m_dw.onTrue(new a_back_low_speaker_preset());                        // Back Low Speaker
 
-        m_l.onTrue(new intake_preset());              // Intake
-        m_r.onTrue(new stow_away_preset());               // Stow Away
+        m_l.onTrue(new a_intake_preset());              // Intake
+        m_r.onTrue(new a_stow_away_preset());               // Stow Away
 
-        m_lb.and(m_up).onTrue(new front_high_speaker());           // Front (HIGH) Speaker (Only have one option for front)
+        m_lb.and(m_up).onTrue(new a_front_high_speaker());           // Front (HIGH) Speaker (Only have one option for front)
         //m_lb.and(m_dw).onTrue(new back_high_speaker_preset());           // Back High Speaker
-        m_lb.and(m_dw).onTrue(new a_back_high_speaker());
+        m_lb.and(m_dw).onTrue(new a_back_high_speaker_preset());
 
         //m_rb.whileTrue(new teleIntake());
         //m_a.onTrue(new toggleFlywheel());

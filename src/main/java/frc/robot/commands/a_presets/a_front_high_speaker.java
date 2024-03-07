@@ -1,27 +1,25 @@
 package frc.robot.commands.a_presets;
 
-import static frc.robot.Constants.kARM;
-import static frc.robot.Constants.kBACK_HIGH_SPEAKER_PRESET;
-import static frc.robot.Constants.kFLYWHEEL;
-import static frc.robot.Constants.kINTAKE;
-import static frc.robot.Constants.kWRIST;
+import static frc.robot.Constants.*;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.commands.arm_actions.moveArmTo;
+import frc.robot.commands.wrist_actions.moveWristTo;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.FlyWheel;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Wrist;
 
-public class a_back_high_speaker extends SequentialCommandGroup {
+public class a_front_high_speaker extends ParallelCommandGroup {
 
-    private Intake m_intake;
-    private FlyWheel m_flywheel;
     private Arm m_arm;
     private Wrist m_wrist;
-    
-    public a_back_high_speaker() {
+    private Intake m_intake;
+    private FlyWheel m_flywheel;
+
+    public a_front_high_speaker() {
 
         m_intake = kINTAKE;
         m_flywheel = kFLYWHEEL;
@@ -32,11 +30,10 @@ public class a_back_high_speaker extends SequentialCommandGroup {
 
         addCommands(
             new ParallelCommandGroup(
-                m_arm.setGoalCommand(kBACK_HIGH_SPEAKER_PRESET.kArmPos),
-                new WaitUntilCommand(m_arm::isArmSafe).andThen(m_wrist.setGoalCommand(kBACK_HIGH_SPEAKER_PRESET.kWristPos))
+                m_arm.setGoalCommand(kFORWARD_HIGH_SPEAKER_PRESET.kArmPos),
+                new WaitUntilCommand(m_arm::isArmSafe).andThen(m_wrist.setGoalCommand(kFORWARD_HIGH_SPEAKER_PRESET.kWristPos))
             )
         );
-
     }
-
+    
 }
