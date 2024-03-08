@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.Auto.DoNothing;
 import frc.robot.commands.Auto.PreLoadOnly;
 import frc.robot.commands.Auto.PreLoad_n_Taxi;
+import frc.robot.commands.Auto.TWOPIECE;
 import frc.robot.commands.Auto.TaxiOnly;
 import frc.robot.commands.Auto.TimeTaxiOnly;
 import frc.robot.subsystems.Arm;
@@ -45,6 +46,7 @@ public class Competition {
         m_autoChooser.setDefaultOption("Do Nothing", new DoNothing());
         m_autoChooser.addOption("Do Nothing", new DoNothing());        
         m_autoChooser.addOption("Pre-Load Only", new PreLoadOnly());
+        m_autoChooser.addOption("Two Piece", new TWOPIECE());
         m_autoChooser.addOption("Taxi Only", new TaxiOnly(24.0));
         m_autoChooser.addOption("Pre-Load & Taxi", new PreLoad_n_Taxi());
         m_autoChooser.addOption("Timed taxi", new TimeTaxiOnly(0.2, 1.0));

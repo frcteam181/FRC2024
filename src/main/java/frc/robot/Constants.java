@@ -5,7 +5,7 @@ import frc.robot.MyUtils.Gains;
 import frc.robot.MyUtils.PresetValues;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.DriveTrain;
-import frc.robot.subsystems.FlyWheel;
+import frc.robot.subsystems.Flywheel;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Wrist;
 
@@ -136,7 +136,7 @@ public class Constants {
     public static final PresetValues kFORWARD_AMP_PRESET = new PresetValues(-0.7, 49.0, true);
     
     public static final PresetValues kBACK_HIGH_SPEAKER_PRESET = new PresetValues(-55.0, 81.0, true);
-    public static final PresetValues kBACK_LOW_SPEAKER_PRESET = new PresetValues(-2.4, 16.5, true);
+    public static final PresetValues kBACK_LOW_SPEAKER_PRESET = new PresetValues(10.0, 16.5, true);
     public static final PresetValues kFORWARD_HIGH_SPEAKER_PRESET = new PresetValues(-110, 49.0, true);
 
     /// MUST BE LAST TO LOAD ///
@@ -144,6 +144,6 @@ public class Constants {
     public static final DriveTrain kDRIVE_TRAIN = new DriveTrain(false);
     public static final Arm kARM = new Arm(true);
     public static final Wrist kWRIST = new Wrist(true); 
-    public static final FlyWheel kFLYWHEEL = new FlyWheel(false);
+    public static final Flywheel kFLYWHEEL = new Flywheel(false);
     public static final Intake kINTAKE = new Intake(false);
 }

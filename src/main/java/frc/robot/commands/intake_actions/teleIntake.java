@@ -4,7 +4,7 @@ import static frc.robot.Constants.*;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.FlyWheel;
+import frc.robot.subsystems.Flywheel;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Wrist;
 
@@ -15,7 +15,7 @@ public class teleIntake extends Command {
     }
 
     private Intake m_intake;
-    private FlyWheel m_flywheel;
+    private Flywheel m_flywheel;
     private IntakeState m_intakeState, m_previousState;
     private Arm m_arm;
     private Wrist m_wrist;

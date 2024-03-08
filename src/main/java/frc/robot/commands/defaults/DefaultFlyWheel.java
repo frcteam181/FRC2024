@@ -3,7 +3,7 @@ package frc.robot.commands.defaults;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.FlyWheel;
+import frc.robot.subsystems.Flywheel;
 
 import static frc.robot.Constants.*;
 
@@ -16,7 +16,7 @@ public class DefaultFlyWheel extends Command {
 
     private boolean m_isPS4;
 
-    private FlyWheel m_flyWheel;
+    private Flywheel m_flyWheel;
 
     public DefaultFlyWheel(XboxController controllerXbox, PS4Controller controllerPS4, boolean isPS4) {
 

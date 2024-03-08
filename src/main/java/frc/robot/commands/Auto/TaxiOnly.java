@@ -11,7 +11,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.DriveTrain;
-import frc.robot.subsystems.FlyWheel;
+import frc.robot.subsystems.Flywheel;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Wrist;
 
@@ -21,7 +21,7 @@ public class TaxiOnly extends Command {
     private Arm m_arm;
     private Wrist m_wrist;
     private Intake m_intake;
-    private FlyWheel m_flywheel;
+    private Flywheel m_flywheel;
 
     private double m_distanceIn;
 

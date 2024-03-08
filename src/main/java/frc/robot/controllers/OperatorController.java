@@ -26,7 +26,7 @@ import frc.robot.commands.presets.stow_away_preset;
 import frc.robot.commands.wrist_actions.tiltWristDown;
 import frc.robot.commands.wrist_actions.tiltWristUp;
 import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.FlyWheel;
+import frc.robot.subsystems.Flywheel;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Wrist;
 
@@ -35,7 +35,7 @@ public class OperatorController {
     private Arm m_arm;
     private Intake m_intake;
     private Wrist m_wrist;
-    private FlyWheel m_flyWheel;
+    private Flywheel m_flyWheel;
 
     // Xbox Controller
     private XboxController m_controllerXbox;

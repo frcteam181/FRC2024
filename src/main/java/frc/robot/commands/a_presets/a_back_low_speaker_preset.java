@@ -10,14 +10,14 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.FlyWheel;
+import frc.robot.subsystems.Flywheel;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Wrist;
 
 public class a_back_low_speaker_preset extends SequentialCommandGroup {
 
     private Intake m_intake;
-    private FlyWheel m_flywheel;
+    private Flywheel m_flywheel;
     private Arm m_arm;
     private Wrist m_wrist;
     
@@ -33,7 +33,7 @@ public class a_back_low_speaker_preset extends SequentialCommandGroup {
         addCommands(
             new ParallelCommandGroup(
                 m_arm.setGoalCommand(kBACK_LOW_SPEAKER_PRESET.kArmPos),
-                new WaitUntilCommand(m_arm::isArmSafe).andThen(m_wrist.setGoalCommand(kBACK_LOW_SPEAKER_PRESET.kWristPos))
+                m_wrist.setGoalCommand(kBACK_LOW_SPEAKER_PRESET.kWristPos)
             )
         );
 

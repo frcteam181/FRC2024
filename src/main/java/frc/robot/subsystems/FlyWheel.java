@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static frc.robot.Constants.*;
 
-public class FlyWheel extends SubsystemBase {
+public class Flywheel extends SubsystemBase {
 
     private CANSparkMax m_leftMotor, m_rightMotor;
 
@@ -38,7 +38,7 @@ public class FlyWheel extends SubsystemBase {
     private double m_setpoint, m_kP, m_kI, m_kD, m_kFF, m_userSetpoint;
     private double[] m_response;
 
-    public FlyWheel(boolean isTuning) {
+    public Flywheel(boolean isTuning) {
 
         m_leftMotor = new CANSparkMax(kLEFT_FLYWHEEL_ID, MotorType.kBrushless);
         m_rightMotor = new CANSparkMax(kRIGHT_FLYWHEEL_ID, MotorType.kBrushless);

@@ -3,11 +3,11 @@ package frc.robot.commands.flywheel_actions;
 import static frc.robot.Constants.kFLYWHEEL;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.FlyWheel;
+import frc.robot.subsystems.Flywheel;
 
 public class toggleFlywheel extends Command {
 
-    private FlyWheel m_flywheel;
+    private Flywheel m_flywheel;
 
     public toggleFlywheel() {
         m_flywheel = kFLYWHEEL;
