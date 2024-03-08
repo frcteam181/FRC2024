@@ -4,6 +4,7 @@ import edu.wpi.first.math.util.Units;
 import frc.robot.MyUtils.Gains;
 import frc.robot.MyUtils.PresetValues;
 import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Flywheel;
 import frc.robot.subsystems.Intake;
@@ -32,8 +33,13 @@ public class Constants {
 
     public static final int kGYRO_ID = 13;
 
+    public static final int kLEFT_CLIMBER_ID = 14;
+    public static final int kRIGHT_CLIMBER_ID = 15;
+
     /// RoboRIO DIO Channels ////
     public static final int kNOTE_BEAM_CHANNEL = 0;
+    public static final int kLEFT_CLIMBER_HOME_SWITCH_CHANNEL = 1;
+    public static final int kRIGHT_CLIMBER_HOME_SWITCH_CHANNEL = 2;
 
     //// Controllers and Joysticks ////
     public static final int kJOYSTICK_ONE = 0;
@@ -127,6 +133,9 @@ public class Constants {
     public static final double kINTAKE_POWER = 1.0; //90000.0
     public static final double kINTAKE_FEED_POWER = 1.0; //3500.0
 
+    // Climber
+    
+
     //Presets
 
     public static final PresetValues kINTAKE_PRESET = new PresetValues(-5.0, 0.0, true);
@@ -142,6 +151,7 @@ public class Constants {
     /// MUST BE LAST TO LOAD ///
     //// Subsystems ////
     public static final DriveTrain kDRIVE_TRAIN = new DriveTrain(false);
+    public static final Climber kCLIMBER = new Climber(false);
     public static final Arm kARM = new Arm(true);
     public static final Wrist kWRIST = new Wrist(true); 
     public static final Flywheel kFLYWHEEL = new Flywheel(false);

@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.commands.arm_actions.moveArmDown;
 import frc.robot.commands.arm_actions.moveArmUp;
 import frc.robot.commands.defaults.DefaultArm;
+import frc.robot.commands.defaults.DefaultClimber;
 import frc.robot.commands.defaults.DefaultFlyWheel;
 import frc.robot.commands.defaults.DefaultIntake;
 import frc.robot.commands.defaults.DefaultWrist;
@@ -26,6 +27,7 @@ import frc.robot.commands.presets.stow_away_preset;
 import frc.robot.commands.wrist_actions.tiltWristDown;
 import frc.robot.commands.wrist_actions.tiltWristUp;
 import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Flywheel;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Wrist;
@@ -36,6 +38,7 @@ public class OperatorController {
     private Intake m_intake;
     private Wrist m_wrist;
     private Flywheel m_flyWheel;
+    private Climber m_climber;
 
     // Xbox Controller
     private XboxController m_controllerXbox;
@@ -53,6 +56,7 @@ public class OperatorController {
         m_intake = kINTAKE;
         m_wrist = kWRIST;
         m_flyWheel = kFLYWHEEL;
+        m_climber = kCLIMBER;
 
         if (isPS4) {
             setUpPS4Controller();
@@ -64,6 +68,8 @@ public class OperatorController {
         m_intake.setDefaultCommand(new DefaultIntake(m_controllerXbox, m_controllerPS4, isPS4));
         //m_wrist.setDefaultCommand(new DefaultWrist(m_controllerXbox, m_controllerPS4, isPS4));
         m_flyWheel.setDefaultCommand(new DefaultFlyWheel(m_controllerXbox, m_controllerPS4, isPS4));
+        m_climber.setDefaultCommand(new DefaultClimber(m_controllerXbox, m_controllerPS4, isPS4, true));
+        
 
     }
 
