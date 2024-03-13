@@ -129,7 +129,7 @@ public class Arm extends SubsystemBase {
         m_posSetpoint = (state.position - kZERO_ARM); // Corrected to account for abs encoder not being at exactly zero
         m_velSetpoint = (state.velocity);
         m_armFFValue = m_armFF.calculate(m_posSetpoint, state.velocity);
-        m_pid.setReference(state.position, CANSparkBase.ControlType.kPosition, kARM_GAINS.kSlotID, m_armFFValue);
+        //m_pid.setReference(state.position, CANSparkBase.ControlType.kPosition, kARM_GAINS.kSlotID, m_armFFValue);
         if(((getPos() + kZERO_ARM) >= (m_goal.position - Math.toRadians(err))) && ((getPos() + kZERO_ARM) <= (m_goal.position + Math.toRadians(err)))) {m_enabled = false;}
     }
 

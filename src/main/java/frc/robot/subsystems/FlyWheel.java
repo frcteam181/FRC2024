@@ -24,13 +24,7 @@ public class Flywheel extends SubsystemBase {
 
     private RelativeEncoder m_encoder;
 
-    private boolean m_isTuning, m_updateNow, m_isOn;
-
-    public enum FlyWheelStatus {
-        IDLE, SPEEDING_UP, READY, PURGING
-    }
-
-    private FlyWheelStatus m_status;
+    private boolean m_isTuning, m_updateNow, m_enabled, m_isReady;
 
     // Tuning Param
     private ShuffleboardTab m_tab;
@@ -62,8 +56,8 @@ public class Flywheel extends SubsystemBase {
         m_pid.setIZone(kFLYWHEEL_GAINS.kIzone, kFLYWHEEL_GAINS.kSlotID);
         m_pid.setOutputRange(kFLYWHEEL_GAINS.kMinOutput, kFLYWHEEL_GAINS.kMaxOutput, kFLYWHEEL_GAINS.kSlotID);
 
-        m_status = FlyWheelStatus.IDLE;
-        m_isOn = false;
+        m_enabled = true;
+        m_isReady = false;
 
         /* Tuning */
         m_isTuning = isTuning;
@@ -73,22 +67,23 @@ public class Flywheel extends SubsystemBase {
 
     @Override
     public void periodic() {
-        //m_pid.setReference(m_setpoint, CANSparkBase.ControlType.kVelocity, kFLYWHEEL_GAINS.kSlotID);
-
-        m_status = FlyWheelStatus.READY;
+        var err = 100.0;
+        if(m_enabled) {
+            m_pid.setReference(m_setpoint, CANSparkBase.ControlType.kVelocity, kFLYWHEEL_GAINS.kSlotID);
+            if((getVel() >= m_setpoint - err) && (getVel() <= m_setpoint + err)) {
+                if(m_setpoint >= 100) {
+                    m_isReady = true;
+                } else {
+                    m_isReady = false;
+                }
+            } else {m_isReady = false;}
+        }
 
         /* TUNING */
         if(m_isTuning) {periodicTuning();}
     }
 
     public void setVel(double RPM) {
-        if(RPM == 0.0 || RPM == 0) {
-            m_status = FlyWheelStatus.IDLE;
-            System.out.println("Flywheel is on IDLE");
-        } else {
-            m_status = FlyWheelStatus.SPEEDING_UP;
-            System.out.println("Flywheel is on SPEEDING UP");
-        }
         m_setpoint = RPM;
     }
 
@@ -104,32 +99,13 @@ public class Flywheel extends SubsystemBase {
         return m_setpoint;
     }
 
-    public int getStatus() {
-        switch (m_status) {
-            case IDLE:
-                return 0;
-            
-            case SPEEDING_UP:
-                return 1;
-
-            case READY:
-                return 2;
-
-            case PURGING:
-                return 3;
-
-            default:
-                return 0;
-        }
-    }
-
     public void toggleFlywheel() {
-        if(m_isOn) {
+        if(m_enabled) {
             setVel(0.0);
-            m_isOn = !m_isOn;
+            //m_enabled = false;
         } else {
-            setVel(60000.0);
-            m_isOn = !m_isOn;
+            setVel(3000.0);
+            //m_enabled = true;
         }
     }
 

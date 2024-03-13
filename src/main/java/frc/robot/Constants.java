@@ -7,6 +7,7 @@ import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Flywheel;
+import frc.robot.subsystems.Handler;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Wrist;
 
@@ -37,9 +38,13 @@ public class Constants {
     public static final int kRIGHT_CLIMBER_ID = 15;
 
     /// RoboRIO DIO Channels ////
+<<<<<<< Updated upstream
     public static final int kNOTE_BEAM_CHANNEL = 0;
     public static final int kLEFT_CLIMBER_HOME_SWITCH_CHANNEL = 1;
     public static final int kRIGHT_CLIMBER_HOME_SWITCH_CHANNEL = 2;
+=======
+    public static final int kNOTE_BEAM_CHANNEL = 8;
+>>>>>>> Stashed changes
 
     //// Controllers and Joysticks ////
     public static final int kJOYSTICK_ONE = 0;
@@ -74,15 +79,15 @@ public class Constants {
     // Arm (rad)
     public static final Gains kARM_GAINS = new Gains(2.0, 0.0, 0.1, 0.0, 0, -1.0, 1.0, 0.0, Math.toRadians(120.0), Math.toRadians(50.0), 0.0, 0);
 
-    public static final int kLEFT_ARM_CURRENT_LIMIT = 80;
-    public static final int kRIGHT_ARM_CURRENT_LIMIT = 80;
+    public static final int kLEFT_ARM_CURRENT_LIMIT = 20;
+    public static final int kRIGHT_ARM_CURRENT_LIMIT = 20;
 
     public static final double kARM_GEAR_RATIO = (1.0/1.0);
     public static final double kARM_POS_FACTOR_RAD = Math.toRadians(kARM_GEAR_RATIO * 360.0); // rad
     public static final double kARM_VEL_FACTOR_RAD = (kARM_POS_FACTOR_RAD/60.0); // rad/sec
 
-    public static final double kARM_ZERO_OFFSET = 5.83; // rad
-    public static final double kZERO_ARM = 0;//Math.toRadians(28.72); // On bumper reading = 0
+    public static final double kARM_ZERO_OFFSET = (1.685); // rad
+    public static final double kZERO_ARM = Math.toRadians(180.0);//Math.toRadians(28.72); // On bumper reading = 0
 
     public static final double kMAX_ARM_POS_RAD = Math.toRadians(100.0); // rad
     public static final double kMIN_ARM_POS_RAD = Math.toRadians(0.0); // rad
@@ -127,8 +132,10 @@ public class Constants {
 
     public static final int kINTAKE_CURRENT_LIMIT = 40;
 
-    public static final double kINTAKE_POS_FACTOR_RAD = 1; // RPM
-    public static final double kINTAKE_VEL_FACTOR_RAD = 1; // RPM
+    public static final double kINTAKE_GEAR_RATIO = (1.0/9.0);
+    public static final double kINTAKE_POS_FACTOR_IN = (kINTAKE_GEAR_RATIO * 2.0 * Math.PI);
+    public static final double kINTAKE_POS_FACTOR_RAD = 1; // RPM or (Math.toRadians(kINTAKE_GEAR_RATIO * 360.0)); // rad
+    public static final double kINTAKE_VEL_FACTOR_RAD = 1; // RPM or 
 
     public static final double kINTAKE_POWER = 1.0; //90000.0
     public static final double kINTAKE_FEED_POWER = 1.0; //3500.0
@@ -156,4 +163,5 @@ public class Constants {
     public static final Wrist kWRIST = new Wrist(true); 
     public static final Flywheel kFLYWHEEL = new Flywheel(false);
     public static final Intake kINTAKE = new Intake(false);
+    public static final Handler kHANDLER = new Handler();
 }

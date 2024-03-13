@@ -25,7 +25,7 @@ public class Intake extends SubsystemBase {
 
     private SparkPIDController m_pid;
 
-    private boolean m_isTuning, m_hasNote, m_updateNow, m_isFeeding;
+    private boolean m_isTuning, m_hasNote, m_updateNow, m_enabled, m_isReady;
 
     private DigitalInput m_noteBeam;
 
@@ -60,7 +60,8 @@ public class Intake extends SubsystemBase {
 
         m_noteBeam = new DigitalInput(9);
         m_hasNote = m_noteBeam.get();
-        m_isFeeding = false;
+        m_enabled = false;
+        m_isReady = false;
 
         /* Tuning */
         m_isTuning = isTuning;
@@ -70,14 +71,14 @@ public class Intake extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if(!m_isFeeding) {
-            //m_pid.setReference(m_setpoint, CANSparkBase.ControlType.kVelocity, kINTAKE_GAINS.kSlotID);
-            m_motor.set(m_setpoint);
-        } else {
-            m_motor.set(1);
-            //m_pid.setReference(kINTAKE_FEED_POWER, CANSparkBase.ControlType.kVelocity, kINTAKE_GAINS.kSlotID);
+        var err = 100.0;
+        if(m_enabled) {
+            m_pid.setReference(m_setpoint, CANSparkBase.ControlType.kVelocity, kINTAKE_GAINS.kSlotID);
+            if((getVel() >= m_setpoint - err) && (getVel() <= m_setpoint + err)) {m_isReady = true;} else {m_isReady = false;}
         }
+            
         m_hasNote = m_noteBeam.get();
+        
         /* TUNING */
         if(m_isTuning) {periodicTuning();}
     }
@@ -94,7 +95,7 @@ public class Intake extends SubsystemBase {
         m_setpoint = RPM;
     }
 
-    public Command setVelCommand(double RPM) {
+    public Command setVelCommand(double RPM, boolean isRPM) {
         return Commands.runOnce(() -> setVel(RPM), this);
     }
 
@@ -117,11 +118,15 @@ public class Intake extends SubsystemBase {
     }
 
     public double getPosIn() {
-        return (getPos() * (1.0/25.0) * (2 * Math.PI));
+        return (getPos() * kINTAKE_POS_FACTOR_IN);
     }
 
     public double getVel() {
         return m_encoder.getVelocity();
+    }
+
+    public boolean isReady() {
+        return m_isReady;
     }
 
     public double getVoltage() {
@@ -134,14 +139,6 @@ public class Intake extends SubsystemBase {
 
     public double getTemp() {
         return m_motor.getMotorTemperature();
-    }
-
-    public boolean isFeeding() {
-        return m_isFeeding;
-    }
-
-    public void toggleFeed() {
-        m_isFeeding = !m_isFeeding;
     }
 
     public void updateGains() {

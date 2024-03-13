@@ -2,8 +2,13 @@ package frc.robot.controllers;
 
 import static frc.robot.Constants.*;
 
+import com.fasterxml.jackson.databind.AnnotationIntrospector.ReferenceProperty.Type;
+
 import edu.wpi.first.wpilibj.PS4Controller;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.commands.arm_actions.moveArmDown;
@@ -14,8 +19,9 @@ import frc.robot.commands.defaults.DefaultFlyWheel;
 import frc.robot.commands.defaults.DefaultIntake;
 import frc.robot.commands.defaults.DefaultWrist;
 import frc.robot.commands.flywheel_actions.toggleFlywheel;
-import frc.robot.commands.intake_actions.feedFlywheel;
-import frc.robot.commands.intake_actions.teleIntake;
+import frc.robot.commands.handler_commands.h_feedFlywheel;
+import frc.robot.commands.handler_commands.h_intake;
+import frc.robot.commands.handler_commands.h_toggleFlywheel;
 import frc.robot.commands.a_presets.*;
 import frc.robot.commands.presets.back_amp_preset;
 import frc.robot.commands.presets.back_high_speaker_preset;
@@ -29,16 +35,26 @@ import frc.robot.commands.wrist_actions.tiltWristUp;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Flywheel;
+import frc.robot.subsystems.Handler;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Wrist;
 
-public class OperatorController {
+public class OperatorController extends SubsystemBase {
 
     private Arm m_arm;
     private Intake m_intake;
     private Wrist m_wrist;
     private Flywheel m_flyWheel;
+<<<<<<< Updated upstream
     private Climber m_climber;
+=======
+    private Handler m_handler;
+
+    private boolean m_isPS4, m_isRumbleEnabled;
+    private Timer m_timer;
+
+    private int m_rumbleSetting, m_previousState;
+>>>>>>> Stashed changes
 
     // Xbox Controller
     private XboxController m_controllerXbox;
@@ -55,21 +71,36 @@ public class OperatorController {
         m_arm = kARM;
         m_intake = kINTAKE;
         m_wrist = kWRIST;
+<<<<<<< Updated upstream
         m_flyWheel = kFLYWHEEL;
         m_climber = kCLIMBER;
+=======
+        m_flyWheel = kFLYWHEEL; 
+>>>>>>> Stashed changes
 
-        if (isPS4) {
+        m_isPS4 = isPS4;
+
+        m_isRumbleEnabled = false;
+        m_previousState = 0;
+
+        m_timer = new Timer();
+
+        if (m_isPS4) {
             setUpPS4Controller();
         } else {
             setUpXboxController();
         }
 
         //m_arm.setDefaultCommand(new DefaultArm(m_controllerXbox, m_controllerPS4, isPS4));
-        m_intake.setDefaultCommand(new DefaultIntake(m_controllerXbox, m_controllerPS4, isPS4));
+        //m_intake.setDefaultCommand(new DefaultIntake(m_controllerXbox, m_controllerPS4, isPS4));
         //m_wrist.setDefaultCommand(new DefaultWrist(m_controllerXbox, m_controllerPS4, isPS4));
+<<<<<<< Updated upstream
         m_flyWheel.setDefaultCommand(new DefaultFlyWheel(m_controllerXbox, m_controllerPS4, isPS4));
         m_climber.setDefaultCommand(new DefaultClimber(m_controllerXbox, m_controllerPS4, isPS4, true));
         
+=======
+        //m_flyWheel.setDefaultCommand(new DefaultFlyWheel(m_controllerXbox, m_controllerPS4, isPS4));
+>>>>>>> Stashed changes
 
     }
 
@@ -98,7 +129,7 @@ public class OperatorController {
     public void bindPS4Buttons() {
         
         // COMPETITION (DO NOT CHANGE)
-        m_tPS4.whileTrue(new feedFlywheel());                       // Feed Flywheels
+        //m_tPS4.whileTrue(new feedFlywheel());                       // Feed Flywheels
         //m_rbPS4.and(m_tPS4).whileTrue(new feedFlywheel());                       // Feed Flywheels
         m_xPS4.onTrue(new toggleFlywheel());                        // Start Flywheels
         //m_rbPS4.and(m_xPS4).onTrue(new toggleFlywheel());                        // Start Flywheels
@@ -116,7 +147,7 @@ public class OperatorController {
         m_lbPS4.and(m_upPS4).onTrue(new front_high_speaker());           // Front (HIGH) Speaker (Only have one option for front)
         m_lbPS4.and(m_dwPS4).onTrue(new back_high_speaker_preset());           // Back High Speaker
 
-        m_rbPS4.whileTrue(new teleIntake());
+        //m_rbPS4.whileTrue(new teleIntake());
 
         // TESTING & OTHERS
         //m_lbPS4.onTrue(m_intake.setVelCommand(30000)).onFalse(m_intake.setVelCommand(0));
@@ -164,6 +195,8 @@ public class OperatorController {
         m_dw = new POVButton(m_controllerXbox, 180);
         m_l = new POVButton(m_controllerXbox, 270);
 
+        m_handler = kHANDLER;
+
         bindXboxButtons();
 
     }
@@ -177,7 +210,7 @@ public class OperatorController {
         //m_rbPS4.and(m_xPS4).onTrue(new toggleFlywheel());                        // Start Flywheels
         //m_xPS4.onTrue(new toggleFlywheel());
 
-        m_x.onTrue(new a_front_amp_preset());                      // Front Amp
+        /*                m_x.onTrue(new a_front_amp_preset());                      // Front Amp
         m_b.onTrue(new a_back_amp_preset());                       // Back Amp
 
         m_up.onTrue(new a_front_high_speaker());                     // Front (HIGH) Speaker (Only have one option for front)
@@ -188,21 +221,137 @@ public class OperatorController {
 
         m_lb.and(m_up).onTrue(new a_front_high_speaker());           // Front (HIGH) Speaker (Only have one option for front)
         //m_lb.and(m_dw).onTrue(new back_high_speaker_preset());           // Back High Speaker
-        m_lb.and(m_dw).onTrue(new a_back_high_speaker_preset());
+        m_lb.and(m_dw).onTrue(new a_back_high_speaker_preset());                          */                
 
         //m_rb.whileTrue(new teleIntake());
         //m_a.onTrue(new toggleFlywheel());
         //m_y.whileTrue(new feedFlywheel());
 
-        //m_x.onTrue(m_arm.updateNowCommand());
+        //m_start.onTrue(m_arm.updateNowCommand());
 
         //m_a.whileTrue(new tiltWristDown());
         //m_y.whileTrue(new tiltWristUp());
 
+        // Testing
+        m_rb.onTrue(new h_intake());
+        m_a.onTrue(new h_toggleFlywheel());
+        m_y.onTrue(new h_feedFlywheel());
+
+
     }
 
-    public void rumble() {
-        m_controllerPS4.setRumble(null, kARM_GEAR_RATIO);
+    @Override
+    public void periodic() {
+        
+        switch (m_handler.getIntakeState()) {  // 0:Both  1:Left  2:Right
+            case 0: // IDLE
+                break;
+            case 1: // INTAKING
+                break;
+            case 2: // ADJUSTING
+                toggleRumble(2, 1);
+                break;
+            case 3: // READY
+                toggleRumble(3, 2);
+                break;
+            case 4: // FEEDING
+                break;
+            case 5: // OUTAKING
+                break;
+        
+            default:
+                break;
+        }
+
+        switch (m_handler.getFlywheelState()) {
+            case 6: // IDLE
+                break;
+            case 7: // SPEEDINGUP
+                break;
+            case 8: // READY
+                toggleRumble(8, 0);
+                break;
+        
+            default:
+                break;
+        }
+
+        if(m_isRumbleEnabled) {
+            rumble(m_rumbleSetting);
+        }
     }
-    
+
+    public void toggleRumble(int state, int rumbleSetting) {
+        if(state != m_previousState) {
+            m_previousState = state;
+            m_rumbleSetting = rumbleSetting;
+            m_timer.restart();
+            m_isRumbleEnabled = true;
+        } 
+    }
+
+    public void rumble(int rumbleSetting) { //
+        if(m_isPS4) {
+            switch (rumbleSetting) {
+                case 0: // Both Rumble
+                    rumblePS4(0.5, 0, 0.5);
+                    break;
+                case 1: // Left Rumble
+                    rumblePS4(0.1, 1, 0.2);
+                    break;
+                case 2: // Right Rumble
+                    rumblePS4(0.1, 2, 0.2);
+                    break;
+            
+                default:
+                    break;
+            }
+        } else {
+            switch (rumbleSetting) {
+                case 0: // Both Rumble
+                    rumbleXbox(0.5, 0, 0.5);
+                    break;
+                case 1: // Left Rumble
+                    rumbleXbox(0.1, 1, 0.2);
+                    break;
+                case 2: // Right Rumble
+                    rumbleXbox(0.1, 2, 0.2);
+                    break;
+            
+                default:
+                    break;
+            }
+        }
+    }
+
+    public void rumbleXbox(double sec, int type, double value) {
+        if(m_timer.hasElapsed(sec)) {
+            m_controllerXbox.setRumble(RumbleType.kBothRumble, 0);
+            m_isRumbleEnabled = false;
+        } else {
+            if(type == 0) {
+                m_controllerXbox.setRumble(RumbleType.kBothRumble, value);
+            } else if(type == 1) {
+                m_controllerXbox.setRumble(RumbleType.kLeftRumble, value);
+            } else if(type == 2) {
+                m_controllerXbox.setRumble(RumbleType.kRightRumble, value);
+            }
+        }
+    }
+
+    public void rumblePS4(double sec, int type, double value) {
+        if(m_timer.hasElapsed(sec)) {
+            m_controllerPS4.setRumble(RumbleType.kBothRumble, 0);
+            m_isRumbleEnabled = false;
+        } else {
+            if(type == 0) {
+                m_controllerPS4.setRumble(RumbleType.kBothRumble, value);
+            } else if(type == 1) {
+                m_controllerPS4.setRumble(RumbleType.kLeftRumble, value);
+            } else if(type == 2) {
+                m_controllerPS4.setRumble(RumbleType.kRightRumble, value);
+            }
+        }
+    }
+
 }

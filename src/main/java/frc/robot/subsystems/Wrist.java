@@ -109,7 +109,7 @@ public class Wrist extends SubsystemBase {
     public void useState(TrapezoidProfile.State state) {
         var err = 2.0;
         m_setpoint = (state.position - kZERO_WRIST);
-        m_pid.setReference(state.position, CANSparkBase.ControlType.kPosition, kWRIST_GAINS.kSlotID);
+        //m_pid.setReference(state.position, CANSparkBase.ControlType.kPosition, kWRIST_GAINS.kSlotID);
         if(((getPos() + kZERO_WRIST) >= (m_goal.position - Math.toRadians(err))) && ((getPos() + kZERO_WRIST) <= (m_goal.position + Math.toRadians(err)))) {m_enabled = false;}
     }
 
