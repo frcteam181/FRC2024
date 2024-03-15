@@ -76,11 +76,7 @@ public class Arm extends SubsystemBase {
 
         m_leftMotor.follow(m_rightMotor, true);
 
-        m_leftMotor.setIdleMode(IdleMode.kBrake);
-        m_rightMotor.setIdleMode(IdleMode.kBrake);
-
-        //m_leftMotor.setIdleMode(IdleMode.kCoast);
-        //m_rightMotor.setIdleMode(IdleMode.kCoast);
+        setMode(true);
 
         m_rightMotor.burnFlash();
         m_leftMotor.burnFlash();
@@ -129,8 +125,18 @@ public class Arm extends SubsystemBase {
         m_posSetpoint = (state.position - kZERO_ARM); // Corrected to account for abs encoder not being at exactly zero
         m_velSetpoint = (state.velocity);
         m_armFFValue = m_armFF.calculate(m_posSetpoint, state.velocity);
-        //m_pid.setReference(state.position, CANSparkBase.ControlType.kPosition, kARM_GAINS.kSlotID, m_armFFValue);
+        m_pid.setReference(state.position, CANSparkBase.ControlType.kPosition, kARM_GAINS.kSlotID, m_armFFValue);
         if(((getPos() + kZERO_ARM) >= (m_goal.position - Math.toRadians(err))) && ((getPos() + kZERO_ARM) <= (m_goal.position + Math.toRadians(err)))) {m_enabled = false;}
+    }
+
+    public void setMode(boolean isBreak) {
+        if(isBreak) {
+            m_leftMotor.setIdleMode(IdleMode.kBrake);
+            m_rightMotor.setIdleMode(IdleMode.kBrake);
+        } else {
+            m_leftMotor.setIdleMode(IdleMode.kCoast);
+            m_rightMotor.setIdleMode(IdleMode.kCoast);
+        }
     }
 
     public void setGoal(TrapezoidProfile.State goal) {

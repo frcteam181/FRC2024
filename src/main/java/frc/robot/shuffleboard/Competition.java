@@ -1,6 +1,7 @@
 package frc.robot.shuffleboard;
 
 import static frc.robot.Constants.kARM;
+import static frc.robot.Constants.kCLIMBER;
 import static frc.robot.Constants.kDRIVE_TRAIN;
 import static frc.robot.Constants.kINTAKE;
 import static frc.robot.Constants.kWRIST;
@@ -17,6 +18,7 @@ import frc.robot.commands.Auto.TWOPIECE;
 import frc.robot.commands.Auto.TaxiOnly;
 import frc.robot.commands.Auto.TimeTaxiOnly;
 import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Wrist;
@@ -28,6 +30,7 @@ public class Competition {
     private SendableChooser<Command> m_autoChooser;
 
     private Arm m_arm;
+    private Climber m_climber;
     private Wrist m_wrist;
     private Intake m_intake;
     private DriveTrain m_driveTrain;
@@ -38,6 +41,7 @@ public class Competition {
         m_wrist = kWRIST;
         m_intake = kINTAKE;
         m_driveTrain = kDRIVE_TRAIN;
+        m_climber = kCLIMBER;
 
         m_tab = Shuffleboard.getTab("Competition");
 
@@ -57,6 +61,9 @@ public class Competition {
         m_tab.addNumber("Wrist Pos", m_wrist::getPosDeg).withPosition(2, 0);
         m_tab.addNumber("DT Left Pos (in)", m_driveTrain::getLeftPosIn).withPosition(1, 1);
         m_tab.addNumber("DT Right Pos (in)", m_driveTrain::getRightPosIn).withPosition(2, 1);
+
+        m_tab.addBoolean("Left Climber", m_climber::isLeftHome).withPosition(0, 0).withSize(1, 1);
+        m_tab.addBoolean("Right Climber", m_climber::isRightHome).withPosition(0, 0).withSize(1, 1);
 
     }
 

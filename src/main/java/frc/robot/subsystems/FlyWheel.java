@@ -56,10 +56,10 @@ public class Flywheel extends SubsystemBase {
         m_pid.setIZone(kFLYWHEEL_GAINS.kIzone, kFLYWHEEL_GAINS.kSlotID);
         m_pid.setOutputRange(kFLYWHEEL_GAINS.kMinOutput, kFLYWHEEL_GAINS.kMaxOutput, kFLYWHEEL_GAINS.kSlotID);
 
-        m_enabled = true;
+        m_enabled = false;
         m_isReady = false;
 
-        /* Tuning */
+        /* Tuning */ 
         m_isTuning = isTuning;
         if(m_isTuning){tune();}
 
@@ -85,6 +85,10 @@ public class Flywheel extends SubsystemBase {
 
     public void setVel(double RPM) {
         m_setpoint = RPM;
+    }
+
+    public void manual(double vel) {
+        m_rightMotor.set(vel);
     }
 
     public Command setVelCommand(double RPM) {

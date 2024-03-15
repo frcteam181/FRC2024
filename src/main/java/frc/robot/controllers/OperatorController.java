@@ -45,16 +45,13 @@ public class OperatorController extends SubsystemBase {
     private Intake m_intake;
     private Wrist m_wrist;
     private Flywheel m_flyWheel;
-<<<<<<< Updated upstream
-    private Climber m_climber;
-=======
     private Handler m_handler;
+    private Climber m_climber;
 
-    private boolean m_isPS4, m_isRumbleEnabled;
+    private boolean m_isPS4, m_isRumbleEnabled, m_rumbleSet;
     private Timer m_timer;
 
-    private int m_rumbleSetting, m_previousState;
->>>>>>> Stashed changes
+    private int m_rumbleSetting, m_previousIntakeState, m_previousFlywheelState;
 
     // Xbox Controller
     private XboxController m_controllerXbox;
@@ -71,17 +68,16 @@ public class OperatorController extends SubsystemBase {
         m_arm = kARM;
         m_intake = kINTAKE;
         m_wrist = kWRIST;
-<<<<<<< Updated upstream
         m_flyWheel = kFLYWHEEL;
         m_climber = kCLIMBER;
-=======
-        m_flyWheel = kFLYWHEEL; 
->>>>>>> Stashed changes
+        m_handler = kHANDLER;
 
         m_isPS4 = isPS4;
 
         m_isRumbleEnabled = false;
-        m_previousState = 0;
+        m_rumbleSet = false;
+        m_previousIntakeState = 0;
+        m_previousFlywheelState = 6;
 
         m_timer = new Timer();
 
@@ -94,13 +90,9 @@ public class OperatorController extends SubsystemBase {
         //m_arm.setDefaultCommand(new DefaultArm(m_controllerXbox, m_controllerPS4, isPS4));
         //m_intake.setDefaultCommand(new DefaultIntake(m_controllerXbox, m_controllerPS4, isPS4));
         //m_wrist.setDefaultCommand(new DefaultWrist(m_controllerXbox, m_controllerPS4, isPS4));
-<<<<<<< Updated upstream
-        m_flyWheel.setDefaultCommand(new DefaultFlyWheel(m_controllerXbox, m_controllerPS4, isPS4));
-        m_climber.setDefaultCommand(new DefaultClimber(m_controllerXbox, m_controllerPS4, isPS4, true));
-        
-=======
         //m_flyWheel.setDefaultCommand(new DefaultFlyWheel(m_controllerXbox, m_controllerPS4, isPS4));
->>>>>>> Stashed changes
+        m_climber.setDefaultCommand(new DefaultClimber(m_controllerXbox, m_controllerPS4, isPS4, false, false));
+        
 
     }
 
@@ -195,8 +187,6 @@ public class OperatorController extends SubsystemBase {
         m_dw = new POVButton(m_controllerXbox, 180);
         m_l = new POVButton(m_controllerXbox, 270);
 
-        m_handler = kHANDLER;
-
         bindXboxButtons();
 
     }
@@ -210,7 +200,7 @@ public class OperatorController extends SubsystemBase {
         //m_rbPS4.and(m_xPS4).onTrue(new toggleFlywheel());                        // Start Flywheels
         //m_xPS4.onTrue(new toggleFlywheel());
 
-        /*                m_x.onTrue(new a_front_amp_preset());                      // Front Amp
+                       m_x.onTrue(new a_front_amp_preset());                      // Front Amp
         m_b.onTrue(new a_back_amp_preset());                       // Back Amp
 
         m_up.onTrue(new a_front_high_speaker());                     // Front (HIGH) Speaker (Only have one option for front)
@@ -221,7 +211,7 @@ public class OperatorController extends SubsystemBase {
 
         m_lb.and(m_up).onTrue(new a_front_high_speaker());           // Front (HIGH) Speaker (Only have one option for front)
         //m_lb.and(m_dw).onTrue(new back_high_speaker_preset());           // Back High Speaker
-        m_lb.and(m_dw).onTrue(new a_back_high_speaker_preset());                          */                
+        m_lb.and(m_dw).onTrue(new a_back_high_speaker_preset());                                      
 
         //m_rb.whileTrue(new teleIntake());
         //m_a.onTrue(new toggleFlywheel());
@@ -245,18 +235,22 @@ public class OperatorController extends SubsystemBase {
         
         switch (m_handler.getIntakeState()) {  // 0:Both  1:Left  2:Right
             case 0: // IDLE
+                toggleIntakeRumble(0, 0);
                 break;
             case 1: // INTAKING
+                toggleIntakeRumble(1, 0);
                 break;
             case 2: // ADJUSTING
-                toggleRumble(2, 1);
+                toggleIntakeRumble(2, 2);
                 break;
             case 3: // READY
-                toggleRumble(3, 2);
+                toggleIntakeRumble(3, 3);
                 break;
             case 4: // FEEDING
+                toggleIntakeRumble(4, 0);
                 break;
             case 5: // OUTAKING
+                toggleIntakeRumble(5, 0);
                 break;
         
             default:
@@ -265,11 +259,13 @@ public class OperatorController extends SubsystemBase {
 
         switch (m_handler.getFlywheelState()) {
             case 6: // IDLE
+                toggleFlywheelRumble(6, 0);
                 break;
             case 7: // SPEEDINGUP
+                toggleFlywheelRumble(7, 0);
                 break;
             case 8: // READY
-                toggleRumble(8, 0);
+                toggleFlywheelRumble(8, 1);
                 break;
         
             default:
@@ -281,25 +277,37 @@ public class OperatorController extends SubsystemBase {
         }
     }
 
-    public void toggleRumble(int state, int rumbleSetting) {
-        if(state != m_previousState) {
-            m_previousState = state;
+    public void toggleFlywheelRumble(int state, int rumbleSetting) {
+        if(state != m_previousFlywheelState) {
+            m_previousFlywheelState = state;
             m_rumbleSetting = rumbleSetting;
-            m_timer.restart();
             m_isRumbleEnabled = true;
+            m_timer.restart();
         } 
     }
 
-    public void rumble(int rumbleSetting) { //
+    public void toggleIntakeRumble(int state, int rumbleSetting) {
+        if(state != m_previousIntakeState) {
+            m_previousIntakeState = state;
+            m_rumbleSetting = rumbleSetting;
+            m_isRumbleEnabled = true;
+            m_timer.restart();
+        } 
+    }
+
+    public void rumble(int rumbleSetting) { 
         if(m_isPS4) {
             switch (rumbleSetting) {
-                case 0: // Both Rumble
+                case 0: // No Rumble
+                    rumblePS4(0.01, 0, 0.0);
+                    break;
+                case 1: // Both Rumble
                     rumblePS4(0.5, 0, 0.5);
                     break;
-                case 1: // Left Rumble
+                case 2: // Left Rumble
                     rumblePS4(0.1, 1, 0.2);
                     break;
-                case 2: // Right Rumble
+                case 3: // Right Rumble
                     rumblePS4(0.1, 2, 0.2);
                     break;
             
@@ -308,13 +316,16 @@ public class OperatorController extends SubsystemBase {
             }
         } else {
             switch (rumbleSetting) {
-                case 0: // Both Rumble
+                case 0: // No Rumble
+                    rumbleXbox(0.01, 0, 0.0);
+                    break;
+                case 1: // Both Rumble
                     rumbleXbox(0.5, 0, 0.5);
                     break;
-                case 1: // Left Rumble
+                case 2: // Left Rumble
                     rumbleXbox(0.1, 1, 0.2);
                     break;
-                case 2: // Right Rumble
+                case 3: // Right Rumble
                     rumbleXbox(0.1, 2, 0.2);
                     break;
             
@@ -328,14 +339,16 @@ public class OperatorController extends SubsystemBase {
         if(m_timer.hasElapsed(sec)) {
             m_controllerXbox.setRumble(RumbleType.kBothRumble, 0);
             m_isRumbleEnabled = false;
-        } else {
+            m_rumbleSet = false;
+        } else if(!m_rumbleSet) {
             if(type == 0) {
                 m_controllerXbox.setRumble(RumbleType.kBothRumble, value);
             } else if(type == 1) {
                 m_controllerXbox.setRumble(RumbleType.kLeftRumble, value);
             } else if(type == 2) {
                 m_controllerXbox.setRumble(RumbleType.kRightRumble, value);
-            }
+            } 
+            m_rumbleSet = true;
         }
     }
 
@@ -343,13 +356,17 @@ public class OperatorController extends SubsystemBase {
         if(m_timer.hasElapsed(sec)) {
             m_controllerPS4.setRumble(RumbleType.kBothRumble, 0);
             m_isRumbleEnabled = false;
+            m_rumbleSet = false;
         } else {
             if(type == 0) {
                 m_controllerPS4.setRumble(RumbleType.kBothRumble, value);
+                m_rumbleSet = true;
             } else if(type == 1) {
                 m_controllerPS4.setRumble(RumbleType.kLeftRumble, value);
+                m_rumbleSet = true;
             } else if(type == 2) {
                 m_controllerPS4.setRumble(RumbleType.kRightRumble, value);
+                m_rumbleSet = true;
             }
         }
     }

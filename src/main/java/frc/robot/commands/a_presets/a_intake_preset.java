@@ -27,8 +27,10 @@ public class a_intake_preset extends ParallelCommandGroup {
 
         addCommands(
             new ParallelCommandGroup(
-                m_wrist.setGoalCommand(kINTAKE_PRESET.kWristPos),
-                new WaitUntilCommand(m_arm::isArmSuperSafe).andThen(m_arm.setGoalCommand(kINTAKE_PRESET.kArmPos))
+                m_arm.setGoalCommand(kINTAKE_PRESET.kArmPos),
+                m_wrist.setGoalCommand(kINTAKE_PRESET.kWristPos)
+                /*m_wrist.setGoalCommand(kINTAKE_PRESET.kWristPos),
+                new WaitUntilCommand(m_arm::isArmSuperSafe).andThen(m_arm.setGoalCommand(kINTAKE_PRESET.kArmPos))*/
             )
         );
     }

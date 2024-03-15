@@ -38,13 +38,9 @@ public class Constants {
     public static final int kRIGHT_CLIMBER_ID = 15;
 
     /// RoboRIO DIO Channels ////
-<<<<<<< Updated upstream
-    public static final int kNOTE_BEAM_CHANNEL = 0;
-    public static final int kLEFT_CLIMBER_HOME_SWITCH_CHANNEL = 1;
-    public static final int kRIGHT_CLIMBER_HOME_SWITCH_CHANNEL = 2;
-=======
-    public static final int kNOTE_BEAM_CHANNEL = 8;
->>>>>>> Stashed changes
+    public static final int kNOTE_BEAM_CHANNEL = 9;
+    public static final int kLEFT_CLIMBER_HOME_SWITCH_CHANNEL = 8;
+    public static final int kRIGHT_CLIMBER_HOME_SWITCH_CHANNEL = 1;
 
     //// Controllers and Joysticks ////
     public static final int kJOYSTICK_ONE = 0;
@@ -77,10 +73,11 @@ public class Constants {
     
 
     // Arm (rad)
-    public static final Gains kARM_GAINS = new Gains(2.0, 0.0, 0.1, 0.0, 0, -1.0, 1.0, 0.0, Math.toRadians(120.0), Math.toRadians(50.0), 0.0, 0);
+    //public static final Gains kARM_GAINS = new Gains(2.0, 0.0, 0.1, 0.0, 0, -1.0, 1.0, 0.0, Math.toRadians(120.0), Math.toRadians(50.0), 0.0, 0);
+    public static final Gains kARM_GAINS = new Gains(3.0, 0.0, 0.0, 0.0, 0, -1.0, 1.0, 0.0, Math.toRadians(120.0), Math.toRadians(50.0), 0.0, 0);
 
-    public static final int kLEFT_ARM_CURRENT_LIMIT = 20;
-    public static final int kRIGHT_ARM_CURRENT_LIMIT = 20;
+    public static final int kLEFT_ARM_CURRENT_LIMIT = 30;
+    public static final int kRIGHT_ARM_CURRENT_LIMIT = 30;
 
     public static final double kARM_GEAR_RATIO = (1.0/1.0);
     public static final double kARM_POS_FACTOR_RAD = Math.toRadians(kARM_GEAR_RATIO * 360.0); // rad
@@ -89,7 +86,7 @@ public class Constants {
     public static final double kARM_ZERO_OFFSET = (1.685); // rad
     public static final double kZERO_ARM = Math.toRadians(180.0);//Math.toRadians(28.72); // On bumper reading = 0
 
-    public static final double kMAX_ARM_POS_RAD = Math.toRadians(100.0); // rad
+    public static final double kMAX_ARM_POS_RAD = Math.toRadians(90.0); // rad
     public static final double kMIN_ARM_POS_RAD = Math.toRadians(0.0); // rad
     public static final double kSAFE_ARM_POS_RAD = Math.toRadians(20.0); // rad
     public static final double kSUPER_SAFE_ARM_POS_RAD = Math.toRadians(30.0); // rad

@@ -11,7 +11,7 @@ import static frc.robot.Constants.*;
 public class Handler extends SubsystemBase {
 
     private enum IntakeState {
-        IDLE,
+        I_IDLE,
         INTAKING,
         ADJUSTING,
         LOADED,
@@ -20,7 +20,7 @@ public class Handler extends SubsystemBase {
     }
 
     private enum FlywheelState {
-        IDLE,
+        F_IDLE,
         SPEEDINGUP,
         READY
     }
@@ -43,14 +43,14 @@ public class Handler extends SubsystemBase {
         m_flywheel = kFLYWHEEL;
 
         // Intake States
-        m_lastIntakeState = IntakeState.IDLE;
-        m_currentIntakeState = IntakeState.IDLE;
-        m_wantedIntakeState = IntakeState.IDLE;
+        m_lastIntakeState = IntakeState.I_IDLE;
+        m_currentIntakeState = IntakeState.I_IDLE;
+        m_wantedIntakeState = IntakeState.I_IDLE;
 
         // Flywheel States
-        m_lastFlywheelState = FlywheelState.IDLE;
-        m_currentFlywheelState = FlywheelState.IDLE;
-        m_wantedFlywheelState = FlywheelState.IDLE;
+        m_lastFlywheelState = FlywheelState.F_IDLE;
+        m_currentFlywheelState = FlywheelState.F_IDLE;
+        m_wantedFlywheelState = FlywheelState.F_IDLE;
 
         m_intakeTimer = new Timer();
         m_flywheelTimer = new Timer();
@@ -63,7 +63,7 @@ public class Handler extends SubsystemBase {
         printState();
 
         switch (m_currentIntakeState) {
-            case IDLE:
+            case I_IDLE:
                 m_intake.manualIntake(0.0);
                 break;
 
@@ -71,15 +71,16 @@ public class Handler extends SubsystemBase {
                 if(m_lastIntakeState == IntakeState.LOADED && m_intake.hasNote()) {
                     setIntakeState(3);
                 } else {
-                    m_intake.manualIntake(1.0);
                     if(m_intake.hasNote()) {
                     setIntakeState(2);
-                }
+                    break;
+                    }
+                    m_intake.manualIntake(0.5);
                 }
                 break;
 
             case ADJUSTING:
-                if(m_intakeTimer.hasElapsed(1.0)) {
+                if(m_intakeTimer.hasElapsed(0.1)) {
                     m_intakeTimer.stop(); m_intakeTimer.reset();
                     m_lastIntakeState = m_currentIntakeState;
                     m_currentIntakeState = IntakeState.LOADED;
@@ -95,14 +96,17 @@ public class Handler extends SubsystemBase {
 
             case FEEDING:
                 if(!m_intake.hasNote()) {
-                    m_intake.manualIntake(0.0);
+                    setIntakeState(0);
+                    setFlywheelState(6);
+                } else if(m_intake.hasNote() && m_currentFlywheelState == FlywheelState.READY) {
+                    m_intake.manualIntake(0.6);
                 } else {
-                    m_intake.manualIntake(kINTAKE_FEED_POWER);
+                    setIntakeState(0);
                 }
                 break;
 
             case OUTAKING:
-                m_intake.manualIntake(-1.0);
+                m_intake.manualIntake(-0.5);
                 break;
         
             default:
@@ -110,16 +114,16 @@ public class Handler extends SubsystemBase {
         }
 
         switch (m_currentFlywheelState) {
-            case IDLE:
-                m_flywheel.setVel(0.0);
+            case F_IDLE:
+                m_flywheel.manual(0.0);
                 break;
 
             case SPEEDINGUP:
                 if(m_flywheelTimer.hasElapsed(1.5)) {
                     m_flywheelTimer.stop();
-                    setFlywheelState(2);
+                    setFlywheelState(8);
                 } else {
-                    m_flywheel.setVel(1.0);
+                    m_flywheel.manual(1.0);
                 }
                 break;
 
@@ -138,7 +142,7 @@ public class Handler extends SubsystemBase {
         switch (state) {
             case 0:
                 m_lastIntakeState = m_currentIntakeState;
-                m_currentIntakeState = IntakeState.IDLE;
+                m_currentIntakeState = IntakeState.I_IDLE;
                 break;
             case 1:
                 m_lastIntakeState = m_currentIntakeState;
@@ -172,7 +176,7 @@ public class Handler extends SubsystemBase {
 
     public int getIntakeState() {
         switch (m_currentIntakeState) {
-            case IDLE:
+            case I_IDLE:
                 return 0;
             case INTAKING:
                 return 1;
@@ -190,32 +194,19 @@ public class Handler extends SubsystemBase {
         }
     }
 
-    public int getFlywheelState() {
-        switch (m_currentFlywheelState) {
-            case IDLE:
-                return 6;
-            case SPEEDINGUP:
-                return 7;
-            case READY:
-                return 8;
-            default:
-                return 6;
-        }
-    }
-
     public void setFlywheelState(int state) {
 
         switch (state) {
-            case 0:
+            case 6:
                 m_lastFlywheelState = m_currentFlywheelState;
-                m_currentFlywheelState = FlywheelState.IDLE;
+                m_currentFlywheelState = FlywheelState.F_IDLE;
                 break;
-            case 1:
+            case 7:
                 m_lastFlywheelState = m_currentFlywheelState;
                 m_currentFlywheelState = FlywheelState.SPEEDINGUP;
                 m_flywheelTimer.restart();
                 break;
-            case 2:
+            case 8:
                 m_flywheelTimer.stop(); m_flywheelTimer.reset();
                 m_lastFlywheelState = m_currentFlywheelState;
                 m_currentFlywheelState = FlywheelState.READY;
@@ -226,11 +217,34 @@ public class Handler extends SubsystemBase {
         }
     }
 
+    public int getFlywheelState() {
+        switch (m_currentFlywheelState) {
+            case F_IDLE:
+                return 6;
+            case SPEEDINGUP:
+                return 7;
+            case READY:
+                return 8;
+            default:
+                return 6;
+        }
+    }
+
     public void toggleFlywheel() {
         if(m_currentFlywheelState == FlywheelState.SPEEDINGUP || m_currentFlywheelState == FlywheelState.READY) {
-            setFlywheelState(0);
+            System.out.println("Asked Flywheel to IDLE");
+            setFlywheelState(6);
         } else {
-            setFlywheelState(1);
+            setFlywheelState(7);
+            System.out.println("Asked Flywheel to SPEEDUP");
+        }
+    }
+
+    public void toggleintake() {
+        if(m_currentFlywheelState == FlywheelState.SPEEDINGUP || m_currentFlywheelState == FlywheelState.READY) {
+            setFlywheelState(6);
+        } else {
+            setFlywheelState(7);
         }
     }
 

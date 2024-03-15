@@ -19,7 +19,6 @@ public class h_feedFlywheel extends Command {
 
     @Override
     public void initialize() {
-        System.out.println("Feeder Command ran");
         m_handler.setIntakeState(4);
     }
     

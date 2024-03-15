@@ -16,13 +16,14 @@ public class DefaultClimber extends Command {
 
     private double m_speed, m_leftSpeed, m_rightSpeed, m_deadZone;
 
-    private boolean m_isPS4, m_oneStick;
+    private boolean m_isPS4, m_oneStick, m_isLeftStick;
 
-    public DefaultClimber(XboxController controllerXbox, PS4Controller controllerPS4, boolean isPS4, boolean oneStick) {
+    public DefaultClimber(XboxController controllerXbox, PS4Controller controllerPS4, boolean isPS4, boolean oneStick, boolean isLeftStick) {
 
         m_isPS4 = isPS4;
         m_oneStick = oneStick;
         m_deadZone = 0.1;
+        m_isLeftStick = isLeftStick;
         
         m_controllerXbox = controllerXbox;
         m_controllerPS4 = controllerPS4;
@@ -34,12 +35,22 @@ public class DefaultClimber extends Command {
     }
 
     @Override
+    public void initialize() {
+        m_climber.setMode(m_oneStick);
+    }
+
+    @Override
     public void execute() {
         
         if(m_isPS4) {
             if(m_oneStick) {
-                m_speed = m_controllerPS4.getLeftY();
-                m_climber.moveClimber(deadzone(m_speed, m_deadZone));
+                if(m_isLeftStick) {
+                    m_speed = m_controllerPS4.getLeftY();
+                    m_climber.moveClimber(deadzone(m_speed, m_deadZone));
+                } else {
+                    m_speed = m_controllerPS4.getRightY();
+                    m_climber.moveClimber(deadzone(m_speed, m_deadZone));
+                }
             } else {
                 m_leftSpeed = m_controllerPS4.getLeftY();
                 m_rightSpeed = m_controllerPS4.getRightY();
@@ -47,8 +58,13 @@ public class DefaultClimber extends Command {
             }
         } else {
             if(m_oneStick) {
-                m_speed = m_controllerXbox.getLeftY();
-                m_climber.moveClimber(deadzone(m_speed, m_deadZone));
+                if(m_isLeftStick) {
+                    m_speed = m_controllerXbox.getLeftY();
+                    m_climber.moveClimber(deadzone(m_speed, m_deadZone));
+                } else {
+                    m_speed = m_controllerXbox.getRightY();
+                    m_climber.moveClimber(deadzone(m_speed, m_deadZone));
+                }
             } else {
                 m_leftSpeed = m_controllerXbox.getLeftY();
                 m_rightSpeed = m_controllerXbox.getRightY();

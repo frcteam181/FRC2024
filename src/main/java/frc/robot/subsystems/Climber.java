@@ -33,13 +33,8 @@ public class Climber extends SubsystemBase {
         m_leftEncoder = m_leftMotor.getEncoder();
         m_rightEncoder = m_rightMotor.getEncoder();
 
-        m_leftMotor.setIdleMode(IdleMode.kCoast);
-        m_rightMotor.setIdleMode(IdleMode.kCoast);
-
-        //m_leftMotor.setInverted(true);
-        m_rightMotor.setInverted(false);
-
-        m_leftMotor.follow(m_rightMotor, true);
+        m_leftMotor.setIdleMode(IdleMode.kBrake);
+        m_rightMotor.setIdleMode(IdleMode.kBrake);
 
         m_leftHomeSwitch = new DigitalInput(kLEFT_CLIMBER_HOME_SWITCH_CHANNEL);
         m_rightHomeSwitch = new DigitalInput(kRIGHT_CLIMBER_HOME_SWITCH_CHANNEL);
@@ -55,6 +50,16 @@ public class Climber extends SubsystemBase {
         getHomeStatus();
         /* TUNING */
         if(m_isTuning) {periodicTuning();}
+    }
+
+    public void setMode(boolean isOneStick) {
+        if(isOneStick) {
+            m_rightMotor.setInverted(true);
+            m_leftMotor.follow(m_rightMotor, true);
+        } else {
+            m_leftMotor.setInverted(false);
+            m_rightMotor.setInverted(true);
+        }
     }
 
     public void resetLeftEncoder() {
@@ -74,13 +79,13 @@ public class Climber extends SubsystemBase {
     }
 
     public void moveLeftClimber(double leftSpeed) {
-        if(m_isLeftHome) {m_leftMotor.set(0.0);}
-        else {m_leftMotor.set(leftSpeed);}
+        if(m_isLeftHome) {m_leftMotor.set(clamp(leftSpeed, -1.0, 0.0));}
+        else {m_leftMotor.set(clamp(leftSpeed, -1.0, 0.5));}
     } 
 
     public void moveRightClimber(double rightSpeed) {
-        if(m_isRightHome) {m_rightMotor.set(0.0);}
-        else {m_rightMotor.set(rightSpeed);}
+        if(m_isRightHome) {m_rightMotor.set(clamp(rightSpeed, -1.0, 0.0));}
+        else {m_rightMotor.set(clamp(rightSpeed, -1.0, 0.5));}
     }
 
     public void moveClimber(double speed) { //Follower mode only
@@ -126,6 +131,15 @@ public class Climber extends SubsystemBase {
 
     public void periodicTuning() {
 
+    }
+
+    public double clamp(double value, double MIN, double MAX) {
+        if(value > MAX) {
+            return MAX;
+        } else if(value < MIN) {
+            return MIN;
+        }
+        return value;
     }
     
 }
