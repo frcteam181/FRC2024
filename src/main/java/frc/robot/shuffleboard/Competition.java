@@ -17,6 +17,9 @@ import frc.robot.commands.Auto.PreLoad_n_Taxi;
 import frc.robot.commands.Auto.TWOPIECE;
 import frc.robot.commands.Auto.TaxiOnly;
 import frc.robot.commands.Auto.TimeTaxiOnly;
+import frc.robot.commands.Auto.a_PreLoadOnly;
+import frc.robot.commands.Auto.a_PreLoad_n_Taxi;
+import frc.robot.commands.Auto.a_TaxiOnly;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.DriveTrain;
@@ -49,11 +52,9 @@ public class Competition {
 
         m_autoChooser.setDefaultOption("Do Nothing", new DoNothing());
         m_autoChooser.addOption("Do Nothing", new DoNothing());        
-        m_autoChooser.addOption("Pre-Load Only", new PreLoadOnly());
-        m_autoChooser.addOption("Two Piece", new TWOPIECE());
-        m_autoChooser.addOption("Taxi Only", new TaxiOnly(24.0));
-        m_autoChooser.addOption("Pre-Load & Taxi", new PreLoad_n_Taxi());
-        m_autoChooser.addOption("Timed taxi", new TimeTaxiOnly(0.2, 1.0));
+        m_autoChooser.addOption("Pre-Load Only", new a_PreLoadOnly());
+        m_autoChooser.addOption("Taxi Only", new a_TaxiOnly());
+        m_autoChooser.addOption("Pre-Load & Taxi", new a_PreLoad_n_Taxi());
         m_tab.add("Auto", m_autoChooser).withWidget(BuiltInWidgets.kComboBoxChooser).withPosition(3, 0).withSize(2, 1);
 
         m_tab.addBoolean("Has Note", m_intake::hasNote).withPosition(0, 0).withSize(1, 1);
@@ -62,8 +63,8 @@ public class Competition {
         m_tab.addNumber("DT Left Pos (in)", m_driveTrain::getLeftPosIn).withPosition(1, 1);
         m_tab.addNumber("DT Right Pos (in)", m_driveTrain::getRightPosIn).withPosition(2, 1);
 
-        m_tab.addBoolean("Left Climber", m_climber::isLeftHome).withPosition(0, 0).withSize(1, 1);
-        m_tab.addBoolean("Right Climber", m_climber::isRightHome).withPosition(0, 0).withSize(1, 1);
+        m_tab.addBoolean("Left Climber", m_climber::isLeftHome).withPosition(0, 1).withSize(1, 1);
+        m_tab.addBoolean("Right Climber", m_climber::isRightHome).withPosition(0, 2).withSize(1, 1);
 
     }
 

@@ -20,7 +20,9 @@ import frc.robot.commands.defaults.DefaultIntake;
 import frc.robot.commands.defaults.DefaultWrist;
 import frc.robot.commands.flywheel_actions.toggleFlywheel;
 import frc.robot.commands.handler_commands.h_feedFlywheel;
-import frc.robot.commands.handler_commands.h_intake;
+import frc.robot.commands.handler_commands.h_holdIntake;
+import frc.robot.commands.handler_commands.h_toggleIntake;
+import frc.robot.commands.handler_commands.h_toggleOutake;
 import frc.robot.commands.handler_commands.h_toggleFlywheel;
 import frc.robot.commands.a_presets.*;
 import frc.robot.commands.presets.back_amp_preset;
@@ -200,13 +202,14 @@ public class OperatorController extends SubsystemBase {
         //m_rbPS4.and(m_xPS4).onTrue(new toggleFlywheel());                        // Start Flywheels
         //m_xPS4.onTrue(new toggleFlywheel());
 
-                       m_x.onTrue(new a_front_amp_preset());                      // Front Amp
+        m_x.onTrue(new a_front_amp_preset());                      // Front Amp
         m_b.onTrue(new a_back_amp_preset());                       // Back Amp
 
         m_up.onTrue(new a_front_high_speaker());                     // Front (HIGH) Speaker (Only have one option for front)
         m_dw.onTrue(new a_back_low_speaker_preset());                        // Back Low Speaker
 
         m_l.onTrue(new a_intake_preset());              // Intake
+        m_rb.whileTrue(new h_holdIntake());             // Intake
         m_r.onTrue(new a_stow_away_preset());               // Stow Away
 
         m_lb.and(m_up).onTrue(new a_front_high_speaker());           // Front (HIGH) Speaker (Only have one option for front)
@@ -223,9 +226,10 @@ public class OperatorController extends SubsystemBase {
         //m_y.whileTrue(new tiltWristUp());
 
         // Testing
-        m_rb.onTrue(new h_intake());
+        //m_rb.onTrue(new h_toggleIntake());
         m_a.onTrue(new h_toggleFlywheel());
         m_y.onTrue(new h_feedFlywheel());
+        m_start.onTrue(new h_toggleOutake());
 
 
     }

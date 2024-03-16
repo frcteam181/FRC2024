@@ -5,11 +5,11 @@ import static frc.robot.Constants.kHANDLER;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Handler;
 
-public class h_intake extends Command {
+public class h_toggleIntake extends Command {
 
     private Handler m_handler;
 
-    public h_intake() {
+    public h_toggleIntake() {
 
         m_handler = kHANDLER;
 
@@ -19,7 +19,11 @@ public class h_intake extends Command {
 
     @Override
     public void initialize() {
-        m_handler.setIntakeState(1);
+        m_handler.toggleIntake();
     }
-    
+
+    @Override
+    public boolean isFinished() {
+        return true;
+    }   
 }

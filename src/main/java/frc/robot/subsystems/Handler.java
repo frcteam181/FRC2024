@@ -3,6 +3,8 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.presets.intake_preset;
 
@@ -33,7 +35,10 @@ public class Handler extends SubsystemBase {
     private IntakeState m_lastIntakeState, m_currentIntakeState, m_wantedIntakeState, m_lastIntakePrint;
     private FlywheelState m_lastFlywheelState, m_currentFlywheelState, m_wantedFlywheelState, m_lastFlywheelPrint;
 
-    private Timer m_intakeTimer, m_flywheelTimer;
+    private Timer m_intakeTimer, m_flywheelTimer, m_timeToShoot;
+
+    private double m_timeToShootSec;
+    private boolean m_isTimeToShoot;
 
     public Handler() {
 
@@ -54,11 +59,21 @@ public class Handler extends SubsystemBase {
 
         m_intakeTimer = new Timer();
         m_flywheelTimer = new Timer();
+        m_timeToShoot = new Timer();
+
+        m_timeToShootSec = 0.0;
+        m_isTimeToShoot = false;
 
     }
 
     @Override
     public void periodic() {
+
+        if(m_timeToShoot.hasElapsed(m_timeToShootSec) && m_isTimeToShoot) {
+            setIntakeState(4);
+            m_timeToShoot.stop();
+            m_isTimeToShoot = false;
+        }
 
         printState();
 
@@ -75,7 +90,7 @@ public class Handler extends SubsystemBase {
                     setIntakeState(2);
                     break;
                     }
-                    m_intake.manualIntake(0.5);
+                    m_intake.manualIntake(1.0);
                 }
                 break;
 
@@ -169,6 +184,8 @@ public class Handler extends SubsystemBase {
                 break;
         
             default:
+                m_lastIntakeState = m_currentIntakeState;
+                m_currentIntakeState = IntakeState.I_IDLE;
                 break;
         }
         
@@ -201,6 +218,7 @@ public class Handler extends SubsystemBase {
                 m_lastFlywheelState = m_currentFlywheelState;
                 m_currentFlywheelState = FlywheelState.F_IDLE;
                 break;
+                
             case 7:
                 m_lastFlywheelState = m_currentFlywheelState;
                 m_currentFlywheelState = FlywheelState.SPEEDINGUP;
@@ -213,8 +231,29 @@ public class Handler extends SubsystemBase {
                 break;
         
             default:
+                m_lastFlywheelState = m_currentFlywheelState;
+                m_currentFlywheelState = FlywheelState.F_IDLE;
                 break;
         }
+    }
+
+    public Command setFlywheelStateCommand(int state) {
+        return Commands.runOnce(() -> setFlywheelState(state), this);
+    }
+
+    public Command setIntakeStateCommand(int state) {
+        return Commands.runOnce(() -> setIntakeState(state), this);
+    }
+
+    public Command setShooterTimerCommand(double sec) {
+        return Commands.runOnce(() -> setShooterTimer(sec), this);
+    }
+
+    public void setShooterTimer(double sec) {
+        m_timeToShoot.restart();
+        setFlywheelState(7);
+        m_timeToShootSec = sec;
+        m_isTimeToShoot = true;
     }
 
     public int getFlywheelState() {
@@ -232,19 +271,25 @@ public class Handler extends SubsystemBase {
 
     public void toggleFlywheel() {
         if(m_currentFlywheelState == FlywheelState.SPEEDINGUP || m_currentFlywheelState == FlywheelState.READY) {
-            System.out.println("Asked Flywheel to IDLE");
             setFlywheelState(6);
         } else {
             setFlywheelState(7);
-            System.out.println("Asked Flywheel to SPEEDUP");
         }
     }
 
-    public void toggleintake() {
-        if(m_currentFlywheelState == FlywheelState.SPEEDINGUP || m_currentFlywheelState == FlywheelState.READY) {
-            setFlywheelState(6);
+    public void toggleIntake() {
+        if(m_currentIntakeState == IntakeState.INTAKING) {
+            setIntakeState(0);
+        } else if(m_currentIntakeState == IntakeState.I_IDLE) {
+            setIntakeState(1);
+        }
+    }
+
+    public void toggleOutake() {
+        if(m_currentIntakeState == IntakeState.OUTAKING) {
+            setIntakeState(0);
         } else {
-            setFlywheelState(7);
+            setIntakeState(5);
         }
     }
 
@@ -258,6 +303,14 @@ public class Handler extends SubsystemBase {
             System.out.println(m_currentFlywheelState.toString());
             m_lastFlywheelPrint = m_currentFlywheelState;
         }
+    }
+
+    public Command setArmCommand(double pos) {
+        return Commands.runOnce(() -> m_arm.setGoal(pos), m_arm);
+    }
+
+    public Command setWristCommand(double pos) {
+        return Commands.runOnce(() -> m_wrist.setGoal(pos), m_wrist);
     }
     
     

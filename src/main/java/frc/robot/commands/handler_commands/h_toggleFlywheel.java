@@ -13,14 +13,17 @@ public class h_toggleFlywheel extends Command {
 
         m_handler = kHANDLER;
 
-        //addRequirements(m_handler);
+        addRequirements(m_handler);
 
     }
 
     @Override
     public void initialize() {
-        System.out.println("Flywheel Toggle Command Ran");
         m_handler.toggleFlywheel();
     }
-    
+
+    @Override
+    public boolean isFinished() {
+        return true;
+    }   
 }

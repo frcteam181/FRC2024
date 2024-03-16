@@ -134,15 +134,15 @@ public class Constants {
     public static final double kINTAKE_POS_FACTOR_RAD = 1; // RPM or (Math.toRadians(kINTAKE_GEAR_RATIO * 360.0)); // rad
     public static final double kINTAKE_VEL_FACTOR_RAD = 1; // RPM or 
 
-    public static final double kINTAKE_POWER = 1.0; //90000.0
-    public static final double kINTAKE_FEED_POWER = 1.0; //3500.0
+    public static final double kINTAKE_POWER = 1.0; //
+    public static final double kINTAKE_FEED_POWER = 1.0; //
 
     // Climber
     
 
     //Presets
 
-    public static final PresetValues kINTAKE_PRESET = new PresetValues(-5.0, 0.0, true);
+    public static final PresetValues kINTAKE_PRESET = new PresetValues(2.0, 0.0, true);
     public static final PresetValues kSTOW_AWAY_PRESET = new PresetValues(-2.4, 16.5, true);
     
     public static final PresetValues kBACK_AMP_PRESET = new PresetValues(5.6, 94.5, true);
