@@ -148,9 +148,9 @@ public class Constants {
     public static final PresetValues kBACK_AMP_PRESET = new PresetValues(5.6, 94.5, true);
     public static final PresetValues kFORWARD_AMP_PRESET = new PresetValues(-0.7, 49.0, true);
     
-    public static final PresetValues kBACK_HIGH_SPEAKER_PRESET = new PresetValues(-55.0, 81.0, true);
+    public static final PresetValues kBACK_HIGH_SPEAKER_PRESET = new PresetValues(-65.0, 81.0, true);
     public static final PresetValues kBACK_LOW_SPEAKER_PRESET = new PresetValues(10.0, 16.5, true);
-    public static final PresetValues kFORWARD_HIGH_SPEAKER_PRESET = new PresetValues(-110, 49.0, true);
+    public static final PresetValues kFORWARD_HIGH_SPEAKER_PRESET = new PresetValues(-100, 49.0, true);
 
     /// MUST BE LAST TO LOAD ///
     //// Subsystems ////
