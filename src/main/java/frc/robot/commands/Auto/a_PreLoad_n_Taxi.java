@@ -37,7 +37,7 @@ public class a_PreLoad_n_Taxi extends SequentialCommandGroup {
         m_handler = kHANDLER;
         m_driveTrain = kDRIVE_TRAIN;
 
-        addRequirements(m_flywheel, m_intake);
+        addRequirements(m_flywheel, m_intake, m_driveTrain);
 
         addCommands(
             new ParallelCommandGroup(
